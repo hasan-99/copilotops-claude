@@ -1,0 +1,48 @@
+# Claude Code Configuration
+# Model aliases and quick skill shortcuts
+
+# ============================================
+# Model Aliases
+# ============================================
+# Usage: claude ~opus "your prompt"
+# ============================================
+
+alias ~haiku="--model claude-3-5-haiku-20241022"
+alias ~sonnet="--model claude-sonnet-4-20250514"
+alias ~opus="--model claude-opus-4-5-20251101"
+
+# ============================================
+# Quick Skill Aliases
+# ============================================
+# Usage: /fd to invoke frontend-master --design
+# ============================================
+
+# Frontend
+alias /fd="/frontend-master --design"
+alias /fb="/frontend-master --build"
+alias /fm="/frontend-master --modernize"
+alias /resp="/responsive"
+
+# Debugging
+alias /dd="/deep-debug"
+alias /sf="/smart-fix"
+
+# Research & Audit
+alias /pr="/production-audit"
+alias /dr="/deep-research"
+alias /sr="/stack-researcher"
+
+# Workflows
+alias /nf="/new-feature"
+alias /dep="/full-deploy"
+alias /tdd="/tdd-workflow"
+
+# Voice & AI
+alias /va="/voice-agent"
+alias /vapi="/vapi-voice-agent"
+
+# Supabase
+alias /sb="/supabase"
+
+# Git
+alias /gf="/git-flow"

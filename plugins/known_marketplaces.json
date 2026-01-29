@@ -1,0 +1,42 @@
+{
+  "claude-plugins-official": {
+    "source": {
+      "source": "github",
+      "repo": "anthropics/claude-plugins-official"
+    },
+    "installLocation": "/home/qualia/.claude/plugins/marketplaces/claude-plugins-official",
+    "lastUpdated": "2026-01-13T13:55:40.589Z"
+  },
+  "dev-browser-marketplace": {
+    "source": {
+      "source": "github",
+      "repo": "sawyerhood/dev-browser"
+    },
+    "installLocation": "/home/qualia/.claude/plugins/marketplaces/dev-browser-marketplace",
+    "lastUpdated": "2026-01-03T20:40:12.389Z"
+  },
+  "superpowers-marketplace": {
+    "source": {
+      "source": "github",
+      "repo": "obra/superpowers-marketplace"
+    },
+    "installLocation": "/home/qualia/.claude/plugins/marketplaces/superpowers-marketplace",
+    "lastUpdated": "2026-01-11T00:37:27.731Z"
+  },
+  "compounding-engineering": {
+    "source": {
+      "source": "github",
+      "repo": "EveryInc/compounding-engineering-plugin"
+    },
+    "installLocation": "/home/qualia/.claude/plugins/marketplaces/compounding-engineering",
+    "lastUpdated": "2026-01-11T02:40:00.000Z"
+  },
+  "wshobson-agents": {
+    "source": {
+      "source": "github",
+      "repo": "wshobson/agents"
+    },
+    "installLocation": "/home/qualia/.claude/plugins/marketplaces/wshobson-agents",
+    "lastUpdated": "2026-01-11T02:40:00.000Z"
+  }
+}

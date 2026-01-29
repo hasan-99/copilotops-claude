@@ -1,0 +1,30 @@
+# Ephemeral data (large, regenerated)
+projects/
+file-history/
+plugins/cache/
+statsig/
+paste-cache/
+telemetry/
+
+# Session-specific
+todos/
+session-env/
+debug/
+shell-snapshots/
+plans/
+
+# Cache files
+*.cache
+*.log
+stats-cache.json
+history.jsonl
+
+# Sensitive (should not exist here, but just in case)
+.env*
+*credentials*
+*secret*
+*.pem
+*.key
+
+# Archive (old rotated files)
+archive/

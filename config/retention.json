@@ -1,0 +1,35 @@
+{
+  "version": "1.0",
+  "description": "Retention policies for .claude directory state management",
+  "policies": {
+    "file-history": {
+      "max_versions": 5,
+      "max_age_days": 7,
+      "compress_after_days": 3,
+      "description": "File modification tracking"
+    },
+    "debug-logs": {
+      "max_age_days": 30,
+      "compress_after_days": 7,
+      "description": "Agent execution traces"
+    },
+    "shell-snapshots": {
+      "max_age_days": 7,
+      "description": "Bash environment snapshots"
+    },
+    "todos": {
+      "archive_after_days": 180,
+      "description": "Task tracking files"
+    },
+    "projects": {
+      "archive_after_days": 90,
+      "compress": true,
+      "description": "Per-project session state"
+    },
+    "session-env": {
+      "cleanup_empty": true,
+      "max_age_days": 30,
+      "description": "Session environment state"
+    }
+  }
+}
