@@ -12,7 +12,6 @@
 ### Daily Startup
 ```bash
 source ~/.claude/.env.claude && claude
-git status && git branch
 ```
 
 ### Top 10 Commands
@@ -114,8 +113,6 @@ Load ~/.claude/CLAUDE.md (global rules)
 Load project CLAUDE.md (project-specific)
     ↓
 Load recent session from session-env/
-    ↓
-Check git status for context
     ↓
 Agent Ready
     ↓

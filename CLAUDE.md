@@ -16,7 +16,6 @@
 
 **Evidence > Assumptions | Code > Documentation | Efficiency > Verbosity**
 
-- `git status && git branch` before starting
 - Read before Write/Edit
 - Feature branches only
 - TodoWrite for >3 step tasks
@@ -66,6 +65,7 @@ SETUP → DISCUSS → PLAN → EXECUTE → VERIFY → SHIP
 /pr   production-audit            # Production readiness (6 agents)
 /dr   deep-research               # Codebase analysis
 /dep  full-deploy                 # Test -> build -> deploy -> verify
+/seo  seo-master                  # SEO audit, schema, Core Web Vitals
 ```
 
 ---

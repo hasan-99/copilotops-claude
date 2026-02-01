@@ -99,7 +99,6 @@ Extract Best Practices → Update CLAUDE.md
 
 **Priority**: CRITICAL **Triggers**: Session start, before changes
 
-- **Always Check Status First**: Start with `git status` and `git branch`
 - **Feature Branches Only**: Never work on main/master
 - **Incremental Commits**: Commit frequently with meaningful messages
 - **Create Restore Points**: Commit before risky operations
@@ -115,7 +114,6 @@ Extract Best Practices → Update CLAUDE.md
 ## Quick Reference
 
 ### CRITICAL (Never Compromise)
-- `git status && git branch` before starting
 - Read before Write/Edit operations
 - Feature branches only
 - Root cause analysis on failures
