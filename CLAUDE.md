@@ -30,6 +30,43 @@
 
 ---
 
+## Security Rules
+
+Generate secure code. Validate all inputs. Use parameterized queries.
+
+### Authentication & Authorization
+- ALWAYS check auth in Server Actions and Route Handlers -- never rely on middleware alone.
+- ALWAYS derive user identity from Supabase `auth.uid()` or `getUser()` -- never trust client-provided IDs.
+- ALWAYS protect admin/dashboard pages with server-side auth guards.
+- NEVER create POST/PUT/PATCH/DELETE routes without auth as the first check.
+- NEVER expose `service_role` key, database URLs, or internal secrets to client code.
+- NEVER use `NEXT_PUBLIC_` prefix for sensitive values.
+
+### Supabase
+- ALWAYS enable RLS on every new table in the same migration that creates it.
+- ALWAYS write RLS policies that check `auth.uid()` for row-level access.
+- ALWAYS use anon key client-side, `service_role` key server-side only.
+- NEVER create a table without RLS policies.
+
+### Input / Output
+- ALWAYS validate API route and Server Action inputs with Zod schemas.
+- ALWAYS use React JSX (auto-escaped) for rendering. Prefer over HTML strings.
+- NEVER use `dangerouslySetInnerHTML`. Sanitize with DOMPurify if unavoidable.
+- NEVER use `eval()`, `new Function()`, or `exec` on user-controlled input.
+- NEVER log PII, tokens, or credentials.
+
+### Dependencies & Secrets
+- NEVER hardcode API keys, tokens, or credentials in source code.
+- NEVER import packages you cannot verify exist in npm -- flag unfamiliar packages.
+- NEVER commit `.env` files. Verify `.gitignore` includes `.env*`.
+
+### Error Handling
+- NEVER expose stack traces, DB errors, or internal paths to the client.
+- ALWAYS return generic error messages to users; log details server-side only.
+- ALWAYS set security headers: CSP, HSTS, X-Content-Type-Options, Referrer-Policy.
+
+---
+
 ## Behavioral Patterns
 
 <default_to_action>

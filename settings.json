@@ -22,6 +22,11 @@
       "Grep(*)"
     ],
     "deny": [
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Read(~/.gnupg/**)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
       "Write(*.env*)",
       "Write(*credentials*)",
       "Write(*secret*)",
