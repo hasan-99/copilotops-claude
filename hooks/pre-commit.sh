@@ -69,6 +69,53 @@ if [ -f ".eslintrc.json" ] || [ -f ".eslintrc.js" ] || [ -f "eslint.config.js" ]
     fi
 fi
 
+# Run tests if test script exists (quality gate)
+if [ -f "package.json" ]; then
+    # Check if test script exists and isn't the default placeholder
+    TEST_SCRIPT=$(node -e "try { const p = require('./package.json'); console.log(p.scripts?.test || ''); } catch(e) { console.log(''); }" 2>/dev/null)
+
+    if [ -n "$TEST_SCRIPT" ] && [ "$TEST_SCRIPT" != "echo \"Error: no test specified\" && exit 1" ]; then
+        echo "Running tests..."
+
+        # Run tests but only for changed files if possible
+        if echo "$TEST_SCRIPT" | grep -q "vitest\|jest"; then
+            # Use --changed flag for vitest/jest if available
+            npm test -- --passWithNoTests --changed 2>/dev/null || npm test -- --passWithNoTests 2>/dev/null || {
+                printf "${RED}Tests failed! Fix tests before committing.${NC}\n"
+                printf "${DIM}Tip: Use 'git commit --no-verify' to skip (not recommended)${NC}\n"
+                exit 1
+            }
+        else
+            # Run full test suite for other test runners
+            npm test 2>/dev/null || {
+                printf "${RED}Tests failed! Fix tests before committing.${NC}\n"
+                printf "${DIM}Tip: Use 'git commit --no-verify' to skip (not recommended)${NC}\n"
+                exit 1
+            }
+        fi
+        printf "${GREEN}Tests passed!${NC}\n"
+    fi
+fi
+
+# Run build check if build script exists (opt-in via CLAUDE_PRE_COMMIT_BUILD=1)
+if [ "$CLAUDE_PRE_COMMIT_BUILD" = "1" ] && [ -f "package.json" ]; then
+    BUILD_SCRIPT=$(node -e "try { const p = require('./package.json'); console.log(p.scripts?.build || ''); } catch(e) { console.log(''); }" 2>/dev/null)
+
+    # Only run build check for significant changes (not just docs/config)
+    SIGNIFICANT_CHANGES=$(echo "$STAGED_FILES" | grep -E '\.(ts|tsx|js|jsx|css|scss)$' | wc -l | tr -d ' ')
+
+    if [ -n "$BUILD_SCRIPT" ] && [ "$SIGNIFICANT_CHANGES" -gt 0 ]; then
+        echo "Checking build..."
+        npm run build 2>/dev/null || {
+            printf "${RED}Build failed! Fix build errors before committing.${NC}\n"
+            exit 1
+        }
+        printf "${GREEN}Build check passed!${NC}\n"
+    fi
+else
+    printf "${YELLOW}Skipping build check (set CLAUDE_PRE_COMMIT_BUILD=1 to enable)${NC}\n"
+fi
+
 # Check for .env files
 ENV_FILES=$(echo "$STAGED_FILES" | grep -E '\.env($|\.)' | grep -v '.example' | grep -v '.sample' || true)
 if [ -n "$ENV_FILES" ]; then

@@ -23,10 +23,43 @@
 - Root cause analysis on failures
 
 **Verification:**
-- ALWAYS run tests before committing
-- ALWAYS `npx tsc --noEmit` before committing
-- ALWAYS verify build locally before deploying
-- NEVER commit with failing tests (unless explicitly told)
+- Run tests before committing
+- Run `npx tsc --noEmit` before committing
+- Verify build locally before deploying
+- Don't commit with failing tests (unless explicitly told)
+
+---
+
+## Behavioral Patterns
+
+<default_to_action>
+By default, implement changes rather than only suggesting them. Infer the most useful action and proceed, using tools to discover missing details instead of guessing.
+</default_to_action>
+
+<investigate_before_answering>
+Never speculate about code you have not opened. If the user references a file, read it before answering. Give grounded, hallucination-free answers.
+</investigate_before_answering>
+
+<context_window_management>
+Context will be automatically compacted as it approaches its limit. Do not stop tasks early due to token budget. Save progress to files before context refreshes. Complete tasks fully.
+</context_window_management>
+
+<use_parallel_tool_calls>
+When calling multiple independent tools, make all calls in parallel. 3 files = 3 Read calls simultaneously. Never use placeholders for dependent calls.
+</use_parallel_tool_calls>
+
+---
+
+## Frontend Aesthetics
+
+<frontend_aesthetics>
+When building UI, create distinctive designs that avoid generic "AI slop" patterns:
+- **Typography**: Use distinctive fonts (not Inter/Arial/Roboto). Vary weight/size for hierarchy.
+- **Color**: Cohesive palette with sharp accents. Use CSS variables for theming.
+- **Motion**: CSS transitions or Motion library. Stagger page load animations.
+- **Depth**: Layered backgrounds, subtle gradients, texture over flat solid colors.
+- **Avoid**: Cookie-cutter card grids, generic hero sections, stock illustrations, blue-purple gradients.
+</frontend_aesthetics>
 
 ---
 
@@ -91,10 +124,24 @@ SETUP → DISCUSS → PLAN → EXECUTE → VERIFY → SHIP
 
 ## Self-Improvement
 
-When I make a mistake: abstract the pattern, suggest a CLAUDE.md rule with ALWAYS/NEVER.
+When I make a mistake: abstract the pattern, suggest a CLAUDE.md rule.
+Use git, tests.json, and progress.txt for state tracking across sessions.
 
 ---
 
 ## Learned Patterns
 
-<!-- Add patterns here as we discover them -->
+### Tool Usage
+- Use native Read/Grep tools instead of bash cat/grep for file operations
+- Make parallel tool calls when reading multiple independent files
+- Investigate code before answering questions about it
+
+### State Management
+- Use git commits as checkpoints during multi-step tasks
+- Structured JSON for machine-readable state, plain text for human-readable progress
+- Save work-in-progress to files before long operations
+
+### Context Transitions
+- On session start: review progress files, git log, and todo state
+- Before context compaction: save current task state to progress file
+- Setup scripts should be idempotent and fast
