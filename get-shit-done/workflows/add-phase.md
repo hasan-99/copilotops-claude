@@ -11,15 +11,15 @@ Read all files referenced by the invoking prompt's execution_context before star
 <step name="parse_arguments">
 Parse the command arguments:
 - All arguments become the phase description
-- Example: `/gsd:add-phase Add authentication` → description = "Add authentication"
-- Example: `/gsd:add-phase Fix critical performance issues` → description = "Fix critical performance issues"
+- Example: `/qualia:add-phase Add authentication` → description = "Add authentication"
+- Example: `/qualia:add-phase Fix critical performance issues` → description = "Fix critical performance issues"
 
 If no arguments provided:
 
 ```
 ERROR: Phase description required
-Usage: /gsd:add-phase <description>
-Example: /gsd:add-phase Add authentication system
+Usage: /qualia:add-phase <description>
+Example: /qualia:add-phase Add authentication system
 ```
 
 Exit.
@@ -35,7 +35,7 @@ INIT=$(node /home/qualia/.claude/get-shit-done/bin/gsd-tools.js init phase-op "0
 Check `roadmap_exists` from init JSON. If false:
 ```
 ERROR: No roadmap found (.planning/ROADMAP.md)
-Run /gsd:new-project to initialize.
+Run /qualia:new-project to initialize.
 ```
 Exit.
 
@@ -111,7 +111,7 @@ Add the new phase entry to the roadmap:
    **Plans:** 0 plans
 
    Plans:
-   - [ ] TBD (run /gsd:plan-phase {N} to break down)
+   - [ ] TBD (run /qualia:plan-phase {N} to break down)
 
    **Details:**
    [To be added during planning]
@@ -153,14 +153,14 @@ Project state updated: .planning/STATE.md
 
 **Phase {N}: {description}**
 
-`/gsd:plan-phase {N}`
+`/qualia:plan-phase {N}`
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/gsd:add-phase <description>` — add another phase
+- `/qualia:add-phase <description>` — add another phase
 - Review roadmap
 
 ---

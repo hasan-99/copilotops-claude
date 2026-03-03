@@ -49,6 +49,19 @@ const MODEL_PROFILES = {
   'gsd-verifier':             { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku' },
   'gsd-plan-checker':         { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku' },
   'gsd-integration-checker':  { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku' },
+
+  // Qualia aliases (same tiers as gsd-* counterparts)
+  'qualia-planner':              { quality: 'opus', balanced: 'opus',   budget: 'sonnet' },
+  'qualia-roadmapper':           { quality: 'opus', balanced: 'sonnet', budget: 'sonnet' },
+  'qualia-executor':             { quality: 'opus', balanced: 'sonnet', budget: 'sonnet' },
+  'qualia-phase-researcher':     { quality: 'opus', balanced: 'sonnet', budget: 'haiku' },
+  'qualia-project-researcher':   { quality: 'opus', balanced: 'sonnet', budget: 'haiku' },
+  'qualia-research-synthesizer': { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku' },
+  'qualia-debugger':             { quality: 'opus', balanced: 'sonnet', budget: 'sonnet' },
+  'qualia-codebase-mapper':      { quality: 'sonnet', balanced: 'haiku', budget: 'haiku' },
+  'qualia-verifier':             { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku' },
+  'qualia-plan-checker':         { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku' },
+  'qualia-integration-checker':  { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku' },
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

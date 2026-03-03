@@ -6,17 +6,17 @@ Model profiles control which Claude model each GSD agent uses. This allows balan
 
 | Agent | `quality` | `balanced` | `budget` |
 |-------|-----------|------------|----------|
-| gsd-planner | opus | opus | sonnet |
-| gsd-roadmapper | opus | sonnet | sonnet |
-| gsd-executor | opus | sonnet | sonnet |
-| gsd-phase-researcher | opus | sonnet | haiku |
-| gsd-project-researcher | opus | sonnet | haiku |
-| gsd-research-synthesizer | sonnet | sonnet | haiku |
-| gsd-debugger | opus | sonnet | sonnet |
-| gsd-codebase-mapper | sonnet | haiku | haiku |
-| gsd-verifier | sonnet | sonnet | haiku |
-| gsd-plan-checker | sonnet | sonnet | haiku |
-| gsd-integration-checker | sonnet | sonnet | haiku |
+| qualia-planner | opus | opus | sonnet |
+| qualia-roadmapper | opus | sonnet | sonnet |
+| qualia-executor | opus | sonnet | sonnet |
+| qualia-phase-researcher | opus | sonnet | haiku |
+| qualia-project-researcher | opus | sonnet | haiku |
+| qualia-research-synthesizer | sonnet | sonnet | haiku |
+| qualia-debugger | opus | sonnet | sonnet |
+| qualia-codebase-mapper | sonnet | haiku | haiku |
+| qualia-verifier | sonnet | sonnet | haiku |
+| qualia-plan-checker | sonnet | sonnet | haiku |
+| qualia-integration-checker | sonnet | sonnet | haiku |
 
 ## Profile Philosophy
 
@@ -49,7 +49,7 @@ Orchestrators resolve model before spawning:
 
 ## Switching Profiles
 
-Runtime: `/gsd:set-profile <profile>`
+Runtime: `/qualia:set-profile <profile>`
 
 Per-project default: Set in `.planning/config.json`:
 ```json
@@ -60,14 +60,14 @@ Per-project default: Set in `.planning/config.json`:
 
 ## Design Rationale
 
-**Why Opus for gsd-planner?**
+**Why Opus for qualia-planner?**
 Planning involves architecture decisions, goal decomposition, and task design. This is where model quality has the highest impact.
 
-**Why Sonnet for gsd-executor?**
+**Why Sonnet for qualia-executor?**
 Executors follow explicit PLAN.md instructions. The plan already contains the reasoning; execution is implementation.
 
 **Why Sonnet (not Haiku) for verifiers in balanced?**
 Verification requires goal-backward reasoning - checking if code *delivers* what the phase promised, not just pattern matching. Sonnet handles this well; Haiku may miss subtle gaps.
 
-**Why Haiku for gsd-codebase-mapper?**
+**Why Haiku for qualia-codebase-mapper?**
 Read-only exploration and pattern extraction. No reasoning required, just structured output from file contents.

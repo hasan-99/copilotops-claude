@@ -445,7 +445,7 @@ Archive requirements for next milestone.
    ✅ REQUIREMENTS.md deleted (fresh one for next milestone)
    ```
 
-**Note:** Next milestone starts with `/gsd:new-milestone` which includes requirements definition. PROJECT.md's Validated section carries cumulative record across milestones.
+**Note:** Next milestone starts with `/qualia:new-milestone` which includes requirements definition. PROJECT.md's Validated section carries cumulative record across milestones.
 
 </step>
 
@@ -727,7 +727,7 @@ Tag: v[X.Y]
 
 **Start Next Milestone** — questioning → research → requirements → roadmap
 
-`/gsd:new-milestone`
+`/qualia:new-milestone`
 
 <sub>`/clear` first → fresh context window</sub>
 
@@ -775,6 +775,6 @@ Milestone completion is successful when:
 - [ ] STATE.md reset to clean template for next milestone
 - [ ] Git tag created (v[X.Y])
 - [ ] Milestone commit made (includes archive files and deletion)
-- [ ] User knows next step (/gsd:new-milestone)
+- [ ] User knows next step (/qualia:new-milestone)
 
 </success_criteria>
