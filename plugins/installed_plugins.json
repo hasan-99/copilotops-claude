@@ -1,113 +1,83 @@
 {
   "version": 2,
   "plugins": {
-    "context7@claude-plugins-official": [
-      {
-        "scope": "user",
-        "installPath": "/home/qualia/.claude/plugins/cache/claude-plugins-official/context7/f70b65538da0",
-        "version": "f70b65538da0",
-        "installedAt": "2025-12-26T18:15:37.530Z",
-        "lastUpdated": "2026-01-13T08:08:49.841Z"
-      }
-    ],
-    "frontend-design@claude-plugins-official": [
-      {
-        "scope": "user",
-        "installPath": "/home/qualia/.claude/plugins/cache/claude-plugins-official/frontend-design/f70b65538da0",
-        "version": "f70b65538da0",
-        "installedAt": "2025-12-26T18:15:37.568Z",
-        "lastUpdated": "2026-01-13T08:08:49.844Z"
-      }
-    ],
-    "feature-dev@claude-plugins-official": [
-      {
-        "scope": "user",
-        "installPath": "/home/qualia/.claude/plugins/cache/claude-plugins-official/feature-dev/f70b65538da0",
-        "version": "f70b65538da0",
-        "installedAt": "2025-12-26T18:15:37.594Z",
-        "lastUpdated": "2026-01-13T08:08:49.849Z"
-      }
-    ],
-    "code-review@claude-plugins-official": [
-      {
-        "scope": "user",
-        "installPath": "/home/qualia/.claude/plugins/cache/claude-plugins-official/code-review/f70b65538da0",
-        "version": "f70b65538da0",
-        "installedAt": "2025-12-26T18:15:37.613Z",
-        "lastUpdated": "2026-01-13T08:08:49.852Z"
-      }
-    ],
-    "supabase@claude-plugins-official": [
-      {
-        "scope": "user",
-        "installPath": "/home/qualia/.claude/plugins/cache/claude-plugins-official/supabase/f70b65538da0",
-        "version": "f70b65538da0",
-        "installedAt": "2025-12-26T18:15:37.633Z",
-        "lastUpdated": "2026-01-13T08:08:49.856Z"
-      }
-    ],
-    "dev-browser@dev-browser-marketplace": [
-      {
-        "scope": "user",
-        "installPath": "/home/qualia/.claude/plugins/cache/dev-browser-marketplace/dev-browser/unknown",
-        "version": "unknown",
-        "installedAt": "2025-12-30T18:34:24.006Z",
-        "lastUpdated": "2025-12-30T18:34:24.006Z"
-      }
-    ],
-    "ralph-wiggum@claude-plugins-official": [
-      {
-        "scope": "user",
-        "installPath": "/home/qualia/.claude/plugins/cache/claude-plugins-official/ralph-wiggum/6703e9f512c5",
-        "version": "6703e9f512c5",
-        "installedAt": "2026-01-03T22:45:00.000Z",
-        "lastUpdated": "2026-01-06T23:12:44.915Z"
-      }
-    ],
-    "github@claude-plugins-official": [
-      {
-        "scope": "user",
-        "installPath": "/home/qualia/.claude/plugins/cache/claude-plugins-official/github/f70b65538da0",
-        "version": "f70b65538da0",
-        "installedAt": "2026-01-08T12:40:56.006Z",
-        "lastUpdated": "2026-01-13T08:08:49.859Z"
-      }
-    ],
-    "security-guidance@claude-plugins-official": [
-      {
-        "scope": "user",
-        "installPath": "/home/qualia/.claude/plugins/cache/claude-plugins-official/security-guidance/f70b65538da0",
-        "version": "f70b65538da0",
-        "installedAt": "2026-01-08T12:40:56.031Z",
-        "lastUpdated": "2026-01-13T08:08:49.862Z"
-      }
-    ],
     "typescript-lsp@claude-plugins-official": [
       {
         "scope": "user",
         "installPath": "/home/qualia/.claude/plugins/cache/claude-plugins-official/typescript-lsp/1.0.0",
         "version": "1.0.0",
         "installedAt": "2026-01-08T12:40:56.055Z",
-        "lastUpdated": "2026-01-08T12:40:56.055Z"
+        "lastUpdated": "2026-02-06T22:33:54.647Z"
       }
     ],
-    "ralph-loop@claude-plugins-official": [
+    "code-review@claude-plugins-official": [
       {
         "scope": "user",
-        "installPath": "/home/qualia/.claude/plugins/cache/claude-plugins-official/ralph-loop/f70b65538da0",
-        "version": "f70b65538da0",
-        "installedAt": "2026-01-11T00:28:20.174Z",
-        "lastUpdated": "2026-01-13T08:08:49.866Z"
+        "installPath": "/home/qualia/.claude/plugins/cache/claude-plugins-official/code-review/55b58ec6e564",
+        "version": "55b58ec6e564",
+        "installedAt": "2026-02-27T20:23:20.736Z",
+        "lastUpdated": "2026-02-27T20:23:20.736Z",
+        "gitCommitSha": "55b58ec6e5649104f926ba7558b567dc8d33c5ff"
       }
     ],
-    "sentry@claude-plugins-official": [
+    "supabase@claude-plugins-official": [
       {
         "scope": "user",
-        "installPath": "/home/qualia/.claude/plugins/cache/claude-plugins-official/sentry/1.0.0",
+        "installPath": "/home/qualia/.claude/plugins/cache/claude-plugins-official/supabase/55b58ec6e564",
+        "version": "55b58ec6e564",
+        "installedAt": "2026-02-27T21:24:17.243Z",
+        "lastUpdated": "2026-02-27T21:24:17.243Z",
+        "gitCommitSha": "55b58ec6e5649104f926ba7558b567dc8d33c5ff"
+      }
+    ],
+    "skill-creator@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/home/qualia/.claude/plugins/cache/claude-plugins-official/skill-creator/55b58ec6e564",
+        "version": "55b58ec6e564",
+        "installedAt": "2026-02-28T10:52:15.241Z",
+        "lastUpdated": "2026-02-28T10:52:15.241Z",
+        "gitCommitSha": "55b58ec6e5649104f926ba7558b567dc8d33c5ff"
+      }
+    ],
+    "firecrawl@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/home/qualia/.claude/plugins/cache/claude-plugins-official/firecrawl/1.0.3",
+        "version": "1.0.3",
+        "installedAt": "2026-02-28T10:54:30.749Z",
+        "lastUpdated": "2026-02-28T10:54:30.749Z",
+        "gitCommitSha": "684b975c8cc6bd0fcfa96f787900bf87fffeef57"
+      }
+    ],
+    "code-simplifier@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/home/qualia/.claude/plugins/cache/claude-plugins-official/code-simplifier/1.0.0",
         "version": "1.0.0",
-        "installedAt": "2026-01-17T16:03:09.413Z",
-        "lastUpdated": "2026-01-17T16:03:09.413Z",
-        "gitCommitSha": "d237d4c314e9066689c401a3d61dd3bbfbb7a209"
+        "installedAt": "2026-02-28T10:54:39.502Z",
+        "lastUpdated": "2026-02-28T10:54:39.502Z",
+        "gitCommitSha": "55b58ec6e5649104f926ba7558b567dc8d33c5ff"
+      }
+    ],
+    "claude-code-setup@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/home/qualia/.claude/plugins/cache/claude-plugins-official/claude-code-setup/1.0.0",
+        "version": "1.0.0",
+        "installedAt": "2026-02-28T10:54:46.864Z",
+        "lastUpdated": "2026-02-28T10:54:46.864Z",
+        "gitCommitSha": "55b58ec6e5649104f926ba7558b567dc8d33c5ff"
+      }
+    ],
+    "claude-md-management@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/home/qualia/.claude/plugins/cache/claude-plugins-official/claude-md-management/1.0.0",
+        "version": "1.0.0",
+        "installedAt": "2026-02-28T10:54:54.083Z",
+        "lastUpdated": "2026-02-28T10:54:54.083Z",
+        "gitCommitSha": "55b58ec6e5649104f926ba7558b567dc8d33c5ff"
       }
     ]
   }

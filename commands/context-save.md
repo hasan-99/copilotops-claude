@@ -8,7 +8,7 @@ Save current project context for future agent coordination:
 
 ## Context Capture Process
 
-Use Task tool with subagent_type="context-manager" to save comprehensive project context.
+Use Task tool with subagent_type="general-purpose" to save comprehensive project context.
 
 Prompt: "Save comprehensive project context for: $ARGUMENTS. Capture:
 

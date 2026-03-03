@@ -4,7 +4,7 @@ Ship the current project to production. Runs quality gates, commits, pushes, dep
 
 ## Steps
 
-1. **Identify project** — `pwd` to determine which project, look up deploy config from `~/.claude/knowledge/deployment-map.md`
+1. **Identify project** — `pwd` to determine which project, look up deploy config from `~/.claude/knowledge/qualia-context.md`
 
 2. **Quality gates** — Run in sequence, stop on failure:
    - `npx tsc --noEmit` (TypeScript check)

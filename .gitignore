@@ -5,6 +5,7 @@ plugins/cache/
 statsig/
 paste-cache/
 telemetry/
+tasks/
 
 # Session-specific
 todos/
@@ -25,6 +26,8 @@ history.jsonl
 *secret*
 *.pem
 *.key
+config/mcp.json
+settings.local.json
 
 # Archive (old rotated files)
 archive/

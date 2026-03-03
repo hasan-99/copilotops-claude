@@ -8,7 +8,7 @@ Restore saved project context for agent coordination:
 
 ## Context Restoration Process
 
-Use Task tool with subagent_type="context-manager" to restore and apply saved context.
+Use Task tool with subagent_type="general-purpose" to restore and apply saved context.
 
 Prompt: "Restore project context for: $ARGUMENTS. Perform the following:
 

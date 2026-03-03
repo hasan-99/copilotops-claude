@@ -2,7 +2,6 @@
 name: stack-researcher
 description: Research latest best practices for any tech stack using web search and documentation - Next.js, React, Supabase, Vercel, Tailwind, etc. Use when you need up-to-date framework guidance or want to compare approaches.
 tags: [research, best-practices, documentation, nextjs, react, supabase, vercel]
-model: claude-opus-4-5-20251101
 ---
 
 # Stack Researcher

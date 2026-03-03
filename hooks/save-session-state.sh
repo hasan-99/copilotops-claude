@@ -1,6 +1,6 @@
 #!/bin/bash
 # Session state persistence hook for Claude Code
-# Saves session state for pm-agent continuity
+# Saves session state for context continuity across sessions
 
 SESSION_DIR="$HOME/.claude/session-env"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)

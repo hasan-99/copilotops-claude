@@ -2,74 +2,25 @@
 model: claude-sonnet-4-5-20250929
 ---
 
-# Deployment Checklist and Configuration
+# Vercel + Supabase Deploy Checklist
 
-Generate deployment configuration and checklist for: $ARGUMENTS
+Quick pre-deploy validation for: $ARGUMENTS
 
-Create comprehensive deployment artifacts:
+## Checks:
+1. **Code Quality**: TypeScript compiles (`npx tsc --noEmit`), no lint errors
+2. **Tests**: All passing (`npm test`)
+3. **Build**: `npm run build` succeeds locally
+4. **Env Vars**: Verify all required env vars set in Vercel dashboard
+5. **Supabase**: Migrations applied, RLS policies active, no exposed service keys
+6. **Security**: No hardcoded keys, auth checks server-side, Zod validation on inputs
 
-1. **Pre-Deployment Checklist**:
-   - [ ] All tests passing
-   - [ ] Security scan completed
-   - [ ] Performance benchmarks met
-   - [ ] Documentation updated
-   - [ ] Database migrations tested
-   - [ ] Rollback plan documented
-   - [ ] Monitoring alerts configured
-   - [ ] Load testing completed
+## Deploy:
+```bash
+git push origin main && vercel --prod
+```
 
-2. **Infrastructure Configuration**:
-   - Docker/containerization setup
-   - Kubernetes manifests
-   - Terraform/IaC scripts
-   - Environment variables
-   - Secrets management
-   - Network policies
-   - Auto-scaling rules
-
-3. **CI/CD Pipeline**:
-   - GitHub Actions/GitLab CI
-   - Build optimization
-   - Test parallelization
-   - Security scanning
-   - Image building
-   - Deployment stages
-   - Rollback automation
-
-4. **Database Deployment**:
-   - Migration scripts
-   - Backup procedures
-   - Connection pooling
-   - Read replica setup
-   - Failover configuration
-   - Data seeding
-   - Version compatibility
-
-5. **Monitoring Setup**:
-   - Application metrics
-   - Infrastructure metrics
-   - Log aggregation
-   - Error tracking
-   - Uptime monitoring
-   - Custom dashboards
-   - Alert channels
-
-6. **Security Configuration**:
-   - SSL/TLS setup
-   - API key rotation
-   - CORS policies
-   - Rate limiting
-   - WAF rules
-   - Security headers
-   - Vulnerability scanning
-
-7. **Post-Deployment**:
-   - [ ] Smoke tests
-   - [ ] Performance validation
-   - [ ] Monitoring verification
-   - [ ] Documentation published
-   - [ ] Team notification
-   - [ ] Customer communication
-   - [ ] Metrics baseline
-
-Include environment-specific configurations (dev, staging, prod) and disaster recovery procedures.
+## Post-Deploy:
+- [ ] Site loads correctly at production URL
+- [ ] API endpoints respond (check /api/health if exists)
+- [ ] Supabase connection working (test a data fetch)
+- [ ] No console errors in browser

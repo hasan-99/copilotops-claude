@@ -2,7 +2,6 @@
 name: deep-research
 description: Deep research and best practices analysis for any codebase - spawns parallel Opus 4.5 agents to analyze frontend, backend, database, security, performance, and deployment. Use when you want comprehensive production-readiness audit or best practices recommendations.
 tags: [research, best-practices, production, analysis, audit, frontend, backend]
-model: claude-opus-4-5-20251101
 ---
 
 # Deep Research & Best Practices Analyzer

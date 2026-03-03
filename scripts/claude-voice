@@ -1,0 +1,13 @@
+#!/bin/bash
+# Voice Claude - DISABLED auto-speak, use manual speak only
+# Run: echo "text" | ~/.claude/scripts/speak.py
+# Requires ELEVEN_API_KEY in shell profile (~/.zshrc)
+
+if [ -z "$ELEVEN_API_KEY" ]; then
+    echo "Warning: ELEVEN_API_KEY not set. Voice output will be disabled." >&2
+    echo "Add to ~/.zshrc: export ELEVEN_API_KEY=\"your-key\"" >&2
+fi
+
+# Just run claude normally - no voice capture
+# To speak something manually: echo "hello" | ~/.claude/scripts/speak.py
+exec claude "$@"

@@ -7,9 +7,9 @@
 # Usage: claude ~opus "your prompt"
 # ============================================
 
-alias ~haiku="--model claude-3-5-haiku-20241022"
-alias ~sonnet="--model claude-sonnet-4-20250514"
-alias ~opus="--model claude-opus-4-5-20251101"
+alias ~haiku="--model claude-haiku-4-5-20251001"
+alias ~sonnet="--model claude-sonnet-4-5-20250929"
+alias ~opus="--model claude-opus-4-6"
 
 # ============================================
 # Quick Skill Aliases
@@ -23,26 +23,24 @@ alias /fb="/frontend-master --build"
 alias /fm="/frontend-master --modernize"
 alias /resp="/responsive"
 
-# Debugging
-alias /dd="/deep-debug"
-alias /sf="/smart-fix"
+# Debugging & Fixing
+alias /dbg="/debug"
+alias /dbf="/debug --frontend"
+alias /dbp="/debug --perf"
 
-# Research & Audit
-alias /pr="/production-audit"
+# Review & Audit
+alias /rv="/review"
+alias /rw="/review --web"
+alias /ra="/review --ai"
 alias /dr="/deep-research"
 alias /sr="/stack-researcher"
 
-# Workflows
-alias /nf="/new-feature"
-alias /dep="/full-deploy"
-alias /tdd="/tdd-workflow"
+# Deploy
+alias /dep="/deploy"
+alias /dq="/deploy --quick"
 
 # Voice & AI
 alias /va="/voice-agent"
-alias /vapi="/vapi-voice-agent"
 
 # Supabase
 alias /sb="/supabase"
-
-# Git
-alias /gf="/git-flow"

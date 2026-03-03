@@ -2,7 +2,6 @@
 name: responsive
 description: Deep responsive design expert. Analyzes and fixes layouts for all screens - mobile, tablet, desktop, ultrawide. Understands breakpoints, container queries, fluid typography, and touch targets.
 tags: [responsive, mobile, layout, breakpoints, accessibility]
-model: claude-opus-4-5-20251101
 ---
 
 # Responsive Design Expert

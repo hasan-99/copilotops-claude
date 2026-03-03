@@ -1,25 +1,71 @@
 {
   "env": {
-    "API_TIMEOUT_MS": "3000000",
-    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+    "API_TIMEOUT_MS": "60000",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "0",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "claude-sonnet-4-5-20250929",
+    "ENABLE_TOOL_SEARCH": "true",
+    "CLAUDE_CODE_MAX_TOOL_USE_TOKENS": "25000"
   },
   "permissions": {
     "allow": [
       "Skill(dev-browser:dev-browser)",
       "Bash(npx tsx:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx prettier:*)",
+      "Bash(npx eslint:*)",
+      "Bash(npx vitest:*)",
+      "Bash(npx playwright:*)",
       "Bash(find:*)",
       "Bash(git:*)",
+      "Bash(gh:*)",
       "Bash(npm:*)",
       "Bash(pnpm:*)",
       "Bash(bun:*)",
-      "Bash(node --version:*)",
-      "Bash(npm --version:*)",
+      "Bash(node:*)",
       "Bash(curl:*)",
       "Bash(xargs:*)",
       "Bash(claude:*)",
+      "Bash(supabase:*)",
+      "Bash(vercel:*)",
+      "Bash(docker:*)",
+      "Bash(wrangler:*)",
+      "Bash(ls:*)",
+      "Bash(wc:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(rm:*)",
+      "Bash(chmod:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(diff:*)",
+      "Bash(which:*)",
+      "Bash(echo:*)",
+      "Bash(jq:*)",
+      "Bash(bash:*)",
+      "Bash(systemctl:*)",
+      "Bash(python3:*)",
+      "Bash(pip:*)",
+      "Bash(sed:*)",
+      "Bash(awk:*)",
+      "Bash(sort:*)",
+      "Bash(uniq:*)",
+      "Bash(date:*)",
+      "Bash(touch:*)",
+      "Bash(tar:*)",
+      "Bash(zip:*)",
+      "Bash(unzip:*)",
       "Read(*)",
+      "Edit(*)",
+      "Write(~/Projects/**)",
+      "Write(~/.claude/**)",
+      "Write(/tmp/**)",
       "Glob(*)",
-      "Grep(*)"
+      "Grep(*)",
+      "mcp__zoho__*",
+      "mcp__zohomcp__*"
     ],
     "deny": [
       "Read(~/.ssh/**)",
@@ -27,14 +73,22 @@
       "Read(~/.gnupg/**)",
       "Read(**/.env)",
       "Read(**/.env.*)",
+      "Read(~/.claude/.credentials.json)",
+      "Read(~/.claude/.env.claude)",
       "Write(*.env*)",
       "Write(*credentials*)",
       "Write(*secret*)",
       "Write(*node_modules*)",
       "Write(*.pem)",
-      "Write(*.key)"
+      "Write(*.key)",
+      "Write(~/.ssh/**)",
+      "Write(~/.aws/**)",
+      "Write(~/.gnupg/**)"
     ]
   },
+  "enabledMcpjsonServers": [
+    "supabase"
+  ],
   "hooks": {
     "PreToolUse": [
       {
@@ -45,6 +99,33 @@
             "command": "~/.claude/hooks/pre-commit.sh"
           }
         ]
+      },
+      {
+        "matcher": "Bash(git push:*)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/branch-guard.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash(rm:*)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/confirm-delete.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/block-env-edit.sh"
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -53,7 +134,25 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hooks/auto-format.sh \"$CLAUDE_FILE_PATH\""
+            "command": "~/.claude/hooks/migration-validate.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/migration-validate.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash(vercel --prod:*)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/post-deploy.sh"
           }
         ]
       }
@@ -75,47 +174,43 @@
           {
             "type": "command",
             "command": "node \"$HOME/.claude/hooks/gsd-check-update.js\""
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/project-health-check.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/session-context-loader.sh"
           }
         ]
       }
     ],
-    "Stop": [
+    "PreCompact": [
       {
         "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/scripts/speak.sh 'Done'"
+            "command": "~/.claude/hooks/pre-compact.sh"
           }
         ]
       }
     ],
-    "Notification": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/scripts/speak.sh 'Need your input'"
-          }
-        ]
-      }
-    ]
+    "Stop": [],
+    "Notification": []
   },
   "statusLine": {
     "type": "command",
     "command": "node \"$HOME/.claude/hooks/gsd-statusline.js\""
   },
   "enabledPlugins": {
-    "context7@claude-plugins-official": true,
-    "frontend-design@claude-plugins-official": true,
-    "feature-dev@claude-plugins-official": true,
-    "code-review@claude-plugins-official": true,
-    "dev-browser@dev-browser-marketplace": true,
-    "supabase@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true,
-    "ralph-loop@claude-plugins-official": true,
-    "sentry@claude-plugins-official": true,
-    "code-simplifier@claude-plugins-official": true
-  }
+    "code-review@claude-plugins-official": true,
+    "supabase@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true,
+    "firecrawl@claude-plugins-official": true
+  },
+  "autoUpdatesChannel": "latest",
+  "skipDangerousModePermissionPrompt": true
 }

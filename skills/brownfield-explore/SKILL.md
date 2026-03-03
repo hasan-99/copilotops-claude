@@ -2,7 +2,6 @@
 name: brownfield-explore
 version: 1.0.1
 description: Explore existing codebase before adding features - map architecture, find integration points, understand patterns. Use at start of brownfield work.
-model: claude-opus-4-5-20251101
 tags: [brownfield, exploration, architecture, analysis]
 ---
 

@@ -1,6 +1,8 @@
-# /audit — Deep project audit
+# /audit — Quick project audit checklist
 
-Comprehensive audit of the current project. Security, performance, code quality, deployment readiness.
+> **Quick checklist scan — no agents, direct grep/check.** For deep parallel-agent analysis with full report, use `/review` instead.
+
+Comprehensive checklist audit of the current project. Security, performance, code quality, deployment readiness.
 
 ## Audit Checklist
 

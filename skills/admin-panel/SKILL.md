@@ -1,7 +1,6 @@
 ---
 name: admin-panel
 description: Build admin dashboard for AI agent - users, conversations, channels, analytics. Quick setup with existing auth.
-model: claude-opus-4-5-20251101
 tags: [admin, dashboard, ui, management]
 ---
 

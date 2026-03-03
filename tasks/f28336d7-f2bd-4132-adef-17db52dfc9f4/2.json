@@ -1,9 +1,0 @@
-{
-  "id": "2",
-  "subject": "Add Refine and Timeline buttons to AnimationPage VideoCard",
-  "description": "Add two buttons to VideoCard component in AnimationPage.tsx:\n1. \"Refine in Kling O1\" - navigates to /kling-o1-refine?url=VIDEO_URL&id=VIDEO_ID\n2. \"Send to Timeline\" - uses addToTimeline from context",
-  "activeForm": "Adding video action buttons",
-  "status": "in_progress",
-  "blocks": [],
-  "blockedBy": []
-}

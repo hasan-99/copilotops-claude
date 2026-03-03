@@ -1,9 +1,0 @@
-{
-  "id": "1",
-  "subject": "Fix video playback in Composite tab - using thumbnail URL instead of video URL",
-  "description": "In CompositingDetailView.tsx, video frames are rendered using `frame.url` which contains the thumbnail URL, not the actual video URL. Need to use `frame.videoUrl` for video playback in both the grid view (lines ~1491-1506) and fullscreen viewer (lines ~1822-1829).",
-  "activeForm": "Fixing video playback URLs",
-  "status": "completed",
-  "blocks": [],
-  "blockedBy": []
-}

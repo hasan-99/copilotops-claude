@@ -48,11 +48,16 @@ count=$(find file-history/ -mindepth 1 -maxdepth 1 -type d -mtime +14 2>/dev/nul
 find file-history/ -mindepth 1 -maxdepth 1 -type d -mtime +14 -exec rm -rf {} \; 2>/dev/null
 echo "  Removed: $count sessions"
 
-# Clean old project sessions (older than 30 days)
-echo "Cleaning project sessions older than 30 days..."
-count=$(find projects/ -name "*.jsonl" -mtime +30 2>/dev/null | wc -l)
-find projects/ -name "*.jsonl" -mtime +30 -delete 2>/dev/null
-echo "  Removed: $count files"
+# Clean old project sessions (older than 14 days for jsonl, 30 days for dirs)
+echo "Cleaning project session logs older than 14 days..."
+count=$(find projects/ -name "*.jsonl" -mtime +14 2>/dev/null | wc -l)
+find projects/ -name "*.jsonl" -mtime +14 -delete 2>/dev/null
+echo "  Removed: $count session logs"
+
+echo "Cleaning project UUID directories older than 14 days..."
+count=$(find projects/ -mindepth 2 -maxdepth 2 -type d -mtime +14 2>/dev/null | wc -l)
+find projects/ -mindepth 2 -maxdepth 2 -type d -mtime +14 -exec rm -rf {} \; 2>/dev/null
+echo "  Removed: $count project session directories"
 
 # Clean empty todo files (2 bytes = [])
 echo "Cleaning empty todo files..."
@@ -70,6 +75,24 @@ echo "  Removed: $count old files"
 echo "Cleaning session-env older than 14 days..."
 count=$(find session-env/ -name "*.json" -mtime +14 2>/dev/null | wc -l)
 find session-env/ -name "*.json" -mtime +14 -delete 2>/dev/null
+echo "  Removed: $count files"
+
+# Clean old session-env UUID directories (older than 7 days)
+echo "Cleaning session-env UUID directories older than 7 days..."
+count=$(find session-env/ -mindepth 1 -maxdepth 1 -type d -mtime +7 2>/dev/null | wc -l)
+find session-env/ -mindepth 1 -maxdepth 1 -type d -mtime +7 -exec rm -rf {} \; 2>/dev/null
+echo "  Removed: $count directories"
+
+# Clean old task output files (older than 7 days)
+echo "Cleaning old task files..."
+count=$(find tasks/ -name "*.json" -mtime +7 2>/dev/null | wc -l)
+find tasks/ -name "*.json" -mtime +7 -delete 2>/dev/null
+echo "  Removed: $count files"
+
+# Clean old paste-cache files (older than 3 days)
+echo "Cleaning paste-cache older than 3 days..."
+count=$(find paste-cache/ -type f -mtime +3 2>/dev/null | wc -l)
+find paste-cache/ -type f -mtime +3 -delete 2>/dev/null
 echo "  Removed: $count files"
 
 # Rotate history.jsonl if larger than 5MB

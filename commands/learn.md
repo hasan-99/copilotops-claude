@@ -17,19 +17,27 @@ Trigger the self-improvement loop when I make an error.
    - Other similar situations
    - Related edge cases
 
-4. **Propose Rule**: Draft CLAUDE.md addition
-   Format:
+4. **Classify**: Which category does this rule belong to?
+   - **Always Rules** — things to always do
+   - **Never Rules** — things to never do
+   - **Project-Specific Gotchas** — quirks of a specific project
+
+5. **Propose Rule**: Draft rule in this format:
    ```
    - [ALWAYS/NEVER] [specific action] [context/when]
    ```
 
-5. **Confirm**: Ask user if rule should be added
+6. **Confirm**: Ask user if rule should be added
 
 ## Output
-Append approved rule to `~/.claude/CLAUDE.md` under "## Learned Patterns"
+Append approved rule to `~/.claude/knowledge/learned-patterns.md` under the appropriate category section.
+
+IMPORTANT: Also add the rule to `~/.claude/CLAUDE.md` under "## Learned Patterns" for immediate loading in every session.
 
 ## Examples of Good Rules
 - ALWAYS check `git status` before suggesting commits
 - NEVER modify files in node_modules
 - ALWAYS use feature branches, never commit to main directly
 - NEVER assume API response structure without checking types
+- ALWAYS check if a Supabase table has RLS before inserting data
+- NEVER hardcode VAPI assistant IDs — use env vars

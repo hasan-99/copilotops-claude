@@ -1,7 +1,6 @@
 ---
 name: voice-agent
 description: Build complete voice AI agents - design conversational flow, create VAPI assistant, integrate Supabase, deploy. Full voice agent development.
-model: claude-opus-4-5-20251101
 tags: [voice, vapi, ai-agent, supabase, elevenlabs]
 ---
 
@@ -178,13 +177,34 @@ CREATE TABLE agent_state (
 ALTER TABLE appointments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE call_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE agent_state ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies: service role only (called from edge functions)
+CREATE POLICY "Service role full access" ON appointments
+  FOR ALL USING (auth.role() = 'service_role');
+
+CREATE POLICY "Service role full access" ON call_logs
+  FOR ALL USING (auth.role() = 'service_role');
+
+CREATE POLICY "Service role full access" ON agent_state
+  FOR ALL USING (auth.role() = 'service_role');
 ```
 
 ### API Functions
 ```typescript
 // supabase/functions/book-appointment/index.ts
+import { z } from "https://deno.land/x/zod/mod.ts"
+
+const BookingSchema = z.object({
+  phone: z.string().min(10),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  time: z.string().regex(/^\d{2}:\d{2}$/),
+  service: z.string().min(1),
+})
+
 serve(async (req) => {
-  const { phone, date, time, service } = await req.json();
+  try {
+  const raw = await req.json();
+  const { phone, date, time, service } = BookingSchema.parse(raw);
 
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL')!,
@@ -223,6 +243,13 @@ serve(async (req) => {
     appointment: data,
     message: `Appointment booked for ${date} at ${time}`
   }));
+  } catch (error) {
+    console.error("Booking error:", error);
+    return new Response(JSON.stringify({
+      success: false,
+      message: "Failed to process booking request"
+    }), { status: 500 });
+  }
 });
 ```
 
@@ -232,7 +259,16 @@ serve(async (req) => {
 ```typescript
 // supabase/functions/vapi-webhook/index.ts
 serve(async (req) => {
-  const event = await req.json();
+  try {
+  // Verify VAPI webhook signature
+  const signature = req.headers.get('x-vapi-signature');
+  const body = await req.text();
+
+  if (!verifyVapiSignature(body, signature, Deno.env.get('VAPI_WEBHOOK_SECRET')!)) {
+    return new Response('Unauthorized', { status: 401 });
+  }
+
+  const event = JSON.parse(body);
   const supabase = createClient(/* ... */);
 
   switch (event.message.type) {
@@ -272,6 +308,13 @@ serve(async (req) => {
   }
 
   return new Response('OK');
+  } catch (error) {
+    console.error("Webhook error:", error);
+    return new Response(JSON.stringify({ error: "Internal server error" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
 });
 ```
 
