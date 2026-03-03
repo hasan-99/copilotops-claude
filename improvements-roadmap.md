@@ -331,8 +331,8 @@ Currently minimal — either flesh out with Qualia-specific patterns or remove.
 ```
 ┌─────────────────────────────────────────────────┐
 │                  YOU (Fawzi)                     │
-│         /gsd:new-project  →  /gsd:plan-phase    │
-│         /gsd:execute-phase → /ship              │
+│       /qualia:new-project → /qualia:plan-phase   │
+│       /qualia:execute-phase → /ship              │
 │         /team full-stack   → /audit             │
 └──────────────────────┬──────────────────────────┘
                        │
@@ -385,3 +385,28 @@ Currently minimal — either flesh out with Qualia-specific patterns or remove.
 - Templates should be opinionated — Fawzi's exact stack, not generic starters.
 - Mobile app template MUST include full EAS Build/Submit pipeline.
 - Team orchestration should be opt-in, not forced — `/team` command or template `team:` field.
+
+---
+
+## Phase 7: /qualia Rename — COMPLETE
+
+Renamed all user-facing gsd → qualia:
+- Commands: /gsd:* → /qualia:*
+- Agents: gsd-* → qualia-*
+- Skill: skills/gsd → skills/qualia
+- Templates & references: all /gsd: → /qualia:
+- UI branding: GSD ► → Qualia ►
+- gsd-tools.js: added qualia-* aliases for model resolution (gsd-* keys retained)
+- Bare `/qualia` command created for quick status checks
+
+Internal engine UNCHANGED:
+- get-shit-done/ directory name
+- gsd-tools.js (file name and all internal logic)
+- Hook files (gsd-statusline.js, gsd-intel-*.js, gsd-check-update.js)
+- GSD_* bash variable names
+
+Known remaining items:
+- [ ] gsd-statusline.js outputs "/gsd:update" in status bar text (manual fix needed)
+- [ ] Existing .planning/ directories in active projects still contain /gsd: references
+- [ ] gsd-* agent keys kept in gsd-tools.js for backward compatibility (can remove later)
+- [ ] commands/gsd symlink can be removed once fully migrated
