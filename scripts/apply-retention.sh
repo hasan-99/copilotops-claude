@@ -3,7 +3,7 @@
 #
 # Usage: ./apply-retention.sh [--dry-run]
 #
-# Generated: 2025-12-31
+# Cross-platform: uses node instead of jq for JSON parsing
 
 set -e
 
@@ -21,9 +21,15 @@ log() {
     echo "[$(date '+%H:%M:%S')] $1"
 }
 
-# Check if jq is available
-if ! command -v jq &> /dev/null; then
-    echo "Error: jq is required. Install with: sudo dnf install jq"
+# Helper: read JSON config value using node (replaces jq)
+json_cfg() {
+    local field="$1"
+    node -e "try{const d=JSON.parse(require('fs').readFileSync('$CONFIG','utf8'));const v=$field;process.stdout.write(String(v))}catch(e){process.stderr.write(e.message);process.exit(1)}" 2>/dev/null
+}
+
+# Check if node is available (needed for JSON parsing)
+if ! command -v node &> /dev/null; then
+    echo "Error: node is required for JSON parsing. Install Node.js from https://nodejs.org"
     exit 1
 fi
 
@@ -33,13 +39,13 @@ if [[ ! -f "$CONFIG" ]]; then
     exit 1
 fi
 
-# Parse retention values
-FILE_HISTORY_DAYS=$(jq -r '.policies["file-history"].max_age_days' "$CONFIG")
-DEBUG_DAYS=$(jq -r '.policies["debug-logs"].max_age_days' "$CONFIG")
-SNAPSHOT_DAYS=$(jq -r '.policies["shell-snapshots"].max_age_days' "$CONFIG")
-TODO_DAYS=$(jq -r '.policies.todos.archive_after_days' "$CONFIG")
-PROJECT_DAYS=$(jq -r '.policies.projects.archive_after_days' "$CONFIG")
-SESSION_DAYS=$(jq -r '.policies["session-env"].max_age_days' "$CONFIG")
+# Parse retention values using node instead of jq
+FILE_HISTORY_DAYS=$(json_cfg "d.policies['file-history'].max_age_days")
+DEBUG_DAYS=$(json_cfg "d.policies['debug-logs'].max_age_days")
+SNAPSHOT_DAYS=$(json_cfg "d.policies['shell-snapshots'].max_age_days")
+TODO_DAYS=$(json_cfg "d.policies.todos.archive_after_days")
+PROJECT_DAYS=$(json_cfg "d.policies.projects.archive_after_days")
+SESSION_DAYS=$(json_cfg "d.policies['session-env'].max_age_days")
 
 log "=== Applying Retention Policies ==="
 log "Config: $CONFIG"

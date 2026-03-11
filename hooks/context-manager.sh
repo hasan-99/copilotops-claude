@@ -2,6 +2,7 @@
 # Context Management System — PreCompact hook
 # Smart /compact strategy: saves critical context before compaction
 # Also doubles as a context budget monitor during session
+# Cross-platform: uses portable file cleanup (no xargs)
 
 # This hook runs when Claude Code triggers /compact (PreCompact event)
 # It preserves key state so compact doesn't lose track of what matters
@@ -62,8 +63,10 @@ $(node -e "try{const s=require('./package.json').scripts;Object.entries(s||{}).f
 - Framework: $(node -e "try{const d=require('./package.json').dependencies||{};console.log(d.next?'Next.js':d.react?'React':d.vue?'Vue':'unknown')}catch(e){console.log('unknown')}" 2>/dev/null)
 SNAPSHOT
 
-# Prune old snapshots (keep last 5 per project)
-ls -t "$STATE_DIR/${PROJECT_NAME}-"*.md 2>/dev/null | tail -n +6 | xargs rm -f 2>/dev/null
+# Prune old snapshots (keep last 5 per project) — portable, no xargs
+ls -t "$STATE_DIR/${PROJECT_NAME}-"*.md 2>/dev/null | tail -n +6 | while IFS= read -r f; do
+    rm -f "$f"
+done
 
 printf "${GREEN}[Context Manager] State saved to ${STATE_FILE}${NC}\n"
 printf "${DIM}  Branch: $(git branch --show-current 2>/dev/null)${NC}\n"

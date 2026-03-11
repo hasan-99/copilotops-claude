@@ -1,6 +1,7 @@
 #!/bin/bash
 # SessionStart hook — reads saved session context and outputs a structured summary
 # Closes the loop: save-session-state.sh writes, this script reads back on next session start
+# Cross-platform: uses node instead of jq for JSON parsing
 
 SESSION_DIR="$HOME/.claude/session-env"
 
@@ -13,19 +14,25 @@ if [ ! -f "$LATEST_SESSION" ] && [ ! -f "$COMPACT_FILE" ]; then
     exit 0
 fi
 
+# Helper: portable JSON field reader using node (replaces jq)
+json_val() {
+    local file="$1" field="$2"
+    node -e "try{const d=JSON.parse(require('fs').readFileSync('$file','utf8'));const v=$field;if(v&&v!=='null')process.stdout.write(String(v))}catch(e){}" 2>/dev/null
+}
+
 echo "--- Previous Session Context ---"
 
 # Read pre-compact data (most recent compaction snapshot)
 if [ -f "$COMPACT_FILE" ]; then
-    TIMESTAMP=$(jq -r '.timestamp // empty' "$COMPACT_FILE" 2>/dev/null)
-    PROJECT=$(jq -r '.project_name // empty' "$COMPACT_FILE" 2>/dev/null)
-    WORKDIR=$(jq -r '.working_directory // empty' "$COMPACT_FILE" 2>/dev/null)
-    BRANCH=$(jq -r '.git_branch // empty' "$COMPACT_FILE" 2>/dev/null)
-    PHASE=$(jq -r '.qualia_phase // .gsd_phase // empty' "$COMPACT_FILE" 2>/dev/null)
-    MILESTONE=$(jq -r '.qualia_milestone // .gsd_milestone // empty' "$COMPACT_FILE" 2>/dev/null)
-    Q_STATUS=$(jq -r '.qualia_status // .gsd_status // empty' "$COMPACT_FILE" 2>/dev/null)
-    Q_TASK=$(jq -r '.qualia_task // .gsd_task // empty' "$COMPACT_FILE" 2>/dev/null)
-    CHANGED=$(jq -r '.changed_files | length' "$COMPACT_FILE" 2>/dev/null)
+    TIMESTAMP=$(json_val "$COMPACT_FILE" "d.timestamp")
+    PROJECT=$(json_val "$COMPACT_FILE" "d.project_name")
+    WORKDIR=$(json_val "$COMPACT_FILE" "d.working_directory")
+    BRANCH=$(json_val "$COMPACT_FILE" "d.git_branch")
+    PHASE=$(json_val "$COMPACT_FILE" "d.qualia_phase||d.gsd_phase")
+    MILESTONE=$(json_val "$COMPACT_FILE" "d.qualia_milestone||d.gsd_milestone")
+    Q_STATUS=$(json_val "$COMPACT_FILE" "d.qualia_status||d.gsd_status")
+    Q_TASK=$(json_val "$COMPACT_FILE" "d.qualia_task||d.gsd_task")
+    CHANGED=$(json_val "$COMPACT_FILE" "(d.changed_files||[]).length")
 
     [ -n "$TIMESTAMP" ] && echo "Last compaction: $TIMESTAMP"
     [ -n "$PROJECT" ] && echo "Project: $PROJECT"
@@ -40,9 +47,9 @@ fi
 
 # Read latest session state (from SessionEnd hook)
 if [ -f "$LATEST_SESSION" ]; then
-    SESSION_TS=$(jq -r '.timestamp // empty' "$LATEST_SESSION" 2>/dev/null)
-    SESSION_PROJECT=$(jq -r '.project // empty' "$LATEST_SESSION" 2>/dev/null)
-    SESSION_BRANCH=$(jq -r '.branch // empty' "$LATEST_SESSION" 2>/dev/null)
+    SESSION_TS=$(json_val "$LATEST_SESSION" "d.timestamp")
+    SESSION_PROJECT=$(json_val "$LATEST_SESSION" "d.project")
+    SESSION_BRANCH=$(json_val "$LATEST_SESSION" "d.branch")
 
     # Only show if different from compact data (adds new info)
     if [ -n "$SESSION_TS" ]; then

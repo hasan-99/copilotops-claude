@@ -1,6 +1,7 @@
 #!/bin/bash
 # Session state persistence hook for Claude Code
 # Saves session state for context continuity across sessions
+# Cross-platform: uses portable file cleanup (no xargs -r)
 
 SESSION_DIR="$HOME/.claude/session-env"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
@@ -33,8 +34,10 @@ cat > "$SESSION_FILE" << EOF
 }
 EOF
 
-# Clean up old session files (keep last 10)
-ls -t "$SESSION_DIR"/session_*.json 2>/dev/null | tail -n +11 | xargs -r rm
+# Clean up old session files (keep last 10) — portable, no xargs -r
+ls -t "$SESSION_DIR"/session_*.json 2>/dev/null | tail -n +11 | while IFS= read -r f; do
+    rm -f "$f"
+done
 
 echo "Session state saved to $SESSION_FILE"
 exit 0

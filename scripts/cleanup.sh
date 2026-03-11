@@ -2,6 +2,7 @@
 # ~/.claude cleanup script
 # Run periodically to keep the directory lean
 # Schedule: 0 3 * * 0 ~/.claude/scripts/cleanup.sh >> ~/.claude/cleanup.log 2>&1
+# Cross-platform: portable file cleanup (no xargs), cross-platform stat
 
 set -e
 CLAUDE_DIR="$HOME/.claude"
@@ -28,18 +29,22 @@ count=$(find plugins/cache -mindepth 2 -maxdepth 2 -type d -mtime +7 2>/dev/null
 find plugins/cache -mindepth 2 -maxdepth 2 -type d -mtime +7 -exec rm -rf {} + 2>/dev/null || true
 echo "  Removed: $count cached plugin versions"
 
-# Keep last N shell snapshots (reduced from 20)
+# Keep last N shell snapshots (reduced from 20) — portable, no xargs
 KEEP_SNAPSHOTS=10
 echo "Cleaning shell snapshots (keeping last $KEEP_SNAPSHOTS)..."
 count=$(ls -t shell-snapshots/*.sh 2>/dev/null | tail -n +$((KEEP_SNAPSHOTS + 1)) | wc -l)
-ls -t shell-snapshots/*.sh 2>/dev/null | tail -n +$((KEEP_SNAPSHOTS + 1)) | xargs rm -f 2>/dev/null
+ls -t shell-snapshots/*.sh 2>/dev/null | tail -n +$((KEEP_SNAPSHOTS + 1)) | while IFS= read -r f; do
+    rm -f "$f"
+done
 echo "  Removed: $count files"
 
-# Keep last N debug logs (reduced from 30)
+# Keep last N debug logs (reduced from 30) — portable, no xargs
 KEEP_DEBUG=15
 echo "Cleaning debug logs (keeping last $KEEP_DEBUG)..."
 count=$(ls -t debug/*.txt 2>/dev/null | tail -n +$((KEEP_DEBUG + 1)) | wc -l)
-ls -t debug/*.txt 2>/dev/null | tail -n +$((KEEP_DEBUG + 1)) | xargs rm -f 2>/dev/null
+ls -t debug/*.txt 2>/dev/null | tail -n +$((KEEP_DEBUG + 1)) | while IFS= read -r f; do
+    rm -f "$f"
+done
 echo "  Removed: $count files"
 
 # Clean old file-history sessions (older than 14 days)
@@ -95,9 +100,9 @@ count=$(find paste-cache/ -type f -mtime +3 2>/dev/null | wc -l)
 find paste-cache/ -type f -mtime +3 -delete 2>/dev/null
 echo "  Removed: $count files"
 
-# Rotate history.jsonl if larger than 5MB
+# Rotate history.jsonl if larger than 5MB — cross-platform stat
 if [ -f history.jsonl ]; then
-    size=$(stat -c%s history.jsonl 2>/dev/null || echo 0)
+    size=$(stat -c%s history.jsonl 2>/dev/null || stat -f%z history.jsonl 2>/dev/null || node -e "console.log(require('fs').statSync('history.jsonl').size)" 2>/dev/null || echo 0)
     if [ "$size" -gt 5242880 ]; then
         echo "Rotating history.jsonl (>5MB)..."
         mkdir -p archive

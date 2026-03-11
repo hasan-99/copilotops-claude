@@ -1,6 +1,7 @@
 #!/bin/bash
 # Pre-compaction hook — saves context before Claude auto-compacts
 # Preserves: changed files, current task, git state, Qualia phase/milestone, project name
+# Cross-platform: uses node instead of jq for JSON array generation
 
 COMPACT_DIR="$HOME/.claude/session-env"
 COMPACT_FILE="$COMPACT_DIR/pre-compact.json"
@@ -14,7 +15,12 @@ GIT_BRANCH=""
 GIT_DIFF_FILES=""
 if git rev-parse --is-inside-work-tree &> /dev/null 2>&1; then
     GIT_BRANCH=$(git branch --show-current 2>/dev/null || echo "")
-    GIT_DIFF_FILES=$(git diff --name-only HEAD 2>/dev/null | head -30 | jq -R -s 'split("\n") | map(select(length > 0))')
+    # Use node instead of jq to convert newline-separated file list to JSON array
+    GIT_DIFF_FILES=$(git diff --name-only HEAD 2>/dev/null | head -30 | node -e "
+        let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{
+            const a=d.split('\n').filter(l=>l.length>0);
+            process.stdout.write(JSON.stringify(a));
+        });" 2>/dev/null)
 fi
 
 [ -z "$GIT_DIFF_FILES" ] && GIT_DIFF_FILES="[]"
