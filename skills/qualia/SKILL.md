@@ -90,7 +90,7 @@ STATE.md exists:
 **If clear next action:**
 Invoke the appropriate skill directly using:
 ```
-Skill(skill="gsd:{action}", args="{phase_number}")
+Skill(skill="qualia:{action}", args="{phase_number}")
 ```
 
 **If ambiguous:**
@@ -133,11 +133,11 @@ Options:
 
 If user provides argument:
 
-- `/gsd plan` → Force plan current phase
-- `/gsd exec` → Force execute current phase
-- `/gsd verify` → Force verify current phase
-- `/gsd next` → Move to next phase
-- `/gsd quick {description}` → Pass to /qualia:quick
+- `/qualia plan` → Route to /qualia:plan-phase for current phase
+- `/qualia exec` → Route to /qualia:execute-phase for current phase
+- `/qualia verify` → Route to /qualia:verify-work for current phase
+- `/qualia next` → Move to next phase
+- `/qualia quick {description}` → Pass to /qualia:quick
 
 ## No Project Fallback
 

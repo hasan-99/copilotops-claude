@@ -20,22 +20,6 @@ if git rev-parse --is-inside-work-tree &> /dev/null 2>&1; then
     GIT_STATUS=$(git status --porcelain 2>/dev/null | head -20 || echo "")
 fi
 
-# Get list of recently modified files (last 2 hours)
-RECENT_FILES=$(find . -type f -mmin -120 \
-    -not -path "*/node_modules/*" \
-    -not -path "*/.git/*" \
-    -not -path "*/.next/*" \
-    -not -path "*/dist/*" \
-    -not -path "*/__pycache__/*" \
-    2>/dev/null | head -50 | jq -R -s 'split("\n") | map(select(length > 0))')
-
-# Check for active todo list
-TODO_FILE="$HOME/.claude/todos/current.json"
-TODOS="[]"
-if [ -f "$TODO_FILE" ]; then
-    TODOS=$(cat "$TODO_FILE" 2>/dev/null || echo "[]")
-fi
-
 # Create session state JSON
 cat > "$SESSION_FILE" << EOF
 {
@@ -45,8 +29,6 @@ cat > "$SESSION_FILE" << EOF
     "branch": "$GIT_BRANCH",
     "has_changes": $([ -n "$GIT_STATUS" ] && echo "true" || echo "false")
   },
-  "recent_files": $RECENT_FILES,
-  "todos": $TODOS,
   "notes": "Session ended at $(date '+%Y-%m-%d %H:%M:%S')"
 }
 EOF

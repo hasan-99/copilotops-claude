@@ -28,7 +28,7 @@ WebFetch: https://docs.stripe.com/llms.txt          — Stripe
 ### 2. WebSearch (Best for specific questions)
 
 ```
-WebSearch: "Next.js 15 server actions authentication 2026"
+WebSearch: "Next.js 16 server actions authentication 2026"
 WebSearch: "supabase realtime subscription React hook"
 WebSearch: "VAPI assistant webhook configuration"
 ```

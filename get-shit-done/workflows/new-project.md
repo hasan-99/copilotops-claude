@@ -861,7 +861,85 @@ Use AskUserQuestion:
 node /home/qualia/.claude/get-shit-done/bin/gsd-tools.js commit "docs: create roadmap ([N] phases)" --files .planning/ROADMAP.md .planning/STATE.md .planning/REQUIREMENTS.md
 ```
 
-## 9. Done
+## 9. Environment Setup
+
+Display stage banner:
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ Qualia ► ENVIRONMENT SETUP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+**Detect what's needed based on project type and stack:**
+
+Check PROJECT.md and research/STACK.md for:
+- Supabase → needs project creation or linking
+- Vercel → needs project linking
+- Environment variables → needs `.env.local`
+- External services (Stripe, VAPI, etc.) → needs API keys
+
+**Present setup checklist:**
+
+Use AskUserQuestion:
+- header: "Env Setup"
+- question: "Let's set up the development environment. Which of these are ready?"
+- multiSelect: true
+- options (dynamically generated from detection):
+  - "Supabase project exists" — I have a Supabase project ready to link
+  - "Vercel project exists" — I have a Vercel project ready
+  - "I'll set these up now" — Walk me through creating them
+  - "Skip for now" — I'll handle environment setup myself later
+
+**If "I'll set these up now":**
+
+Walk through each needed service:
+
+1. **Supabase** (if detected):
+   ```bash
+   supabase init  # If no supabase/ directory
+   supabase link --project-ref <ref>  # User provides ref
+   ```
+
+2. **Vercel** (if detected):
+   ```bash
+   vercel link  # Interactive linking
+   ```
+
+3. **Environment variables:**
+   Create `.env.local` with placeholders:
+   ```bash
+   cat > .env.local << 'EOF'
+   # Supabase
+   NEXT_PUBLIC_SUPABASE_URL=
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=
+   SUPABASE_SERVICE_ROLE_KEY=
+
+   # Add other detected services...
+   EOF
+   ```
+
+   Tell user: "Fill in the values from your Supabase dashboard (Settings → API). I'll wait."
+
+4. **Verify setup:**
+   ```bash
+   # Check Supabase connection
+   supabase status 2>/dev/null
+
+   # Check env vars are populated (not empty)
+   grep -c "=$" .env.local  # Should be 0 if all filled
+   ```
+
+**If "Skip for now":**
+Note in STATE.md: `env_setup: pending` so future commands can warn.
+
+**Commit setup:**
+```bash
+node /home/qualia/.claude/get-shit-done/bin/gsd-tools.js commit "chore: environment setup" --files .env.local supabase/config.toml
+```
+
+Ensure `.env.local` is in `.gitignore` (create/append if needed).
+
+## 10. Done
 
 Present completion with next steps:
 
@@ -879,6 +957,7 @@ Present completion with next steps:
 | Research       | `.planning/research/`       |
 | Requirements   | `.planning/REQUIREMENTS.md` |
 | Roadmap        | `.planning/ROADMAP.md`      |
+| Environment    | `.env.local`                |
 
 **[N] phases** | **[X] requirements** | Ready to build ✓
 

@@ -115,6 +115,14 @@ GSD plans MUST leverage Fawzi's skill library when tasks fall within a skill's d
 | Zoho invoicing, email | zoho-workflow | `~/.claude/skills/zoho-workflow/SKILL.md` |
 | Deployment, CI/CD | deploy | `~/.claude/skills/deploy/SKILL.md` |
 | Deploy verification | deploy-verify | `~/.claude/skills/deploy-verify/SKILL.md` |
+| NestJS backend, APIs, controllers, services | nestjs-backend | `~/.claude/skills/nestjs-backend/SKILL.md` |
+| Authentication, RBAC, ABAC, OTP, guards, RLS | auth-rbac | `~/.claude/skills/auth-rbac/SKILL.md` |
+| React Native Expo, mobile app, navigation | mobile-expo | `~/.claude/skills/mobile-expo/SKILL.md` |
+| i18n, RTL, Arabic, localization, numerals | i18n-rtl | `~/.claude/skills/i18n-rtl/SKILL.md` |
+| Financial ledger, dues, settlements, credit | financial-ledger | `~/.claude/skills/financial-ledger/SKILL.md` |
+| Subscriptions, payments, Stripe, HyperPay, promo | subscription-payments | `~/.claude/skills/subscription-payments/SKILL.md` |
+| Push notifications, FCM, device tokens | fcm-notifications | `~/.claude/skills/fcm-notifications/SKILL.md` |
+| Sakani domain conventions, entities, error codes | sakani-conventions | `~/.claude/skills/sakani-conventions/SKILL.md` |
 
 ### How to Use in Plans
 
@@ -133,7 +141,15 @@ When a task falls within a skill's domain, include the skill's SKILL.md as an `@
 - Match EVERY task against the domain table above
 - If a task touches frontend UI → include `@frontend-master`
 - If a task touches Supabase → include `@supabase`
-- Multiple skills can apply to one plan (e.g., frontend + responsive)
+- If a task touches NestJS backend → include `@nestjs-backend`
+- If a task touches auth, roles, guards, or RLS → include `@auth-rbac`
+- If a task touches React Native mobile → include `@mobile-expo`
+- If a task touches i18n, Arabic, RTL → include `@i18n-rtl`
+- If a task touches ledger, dues, credit, settlements → include `@financial-ledger`
+- If a task touches subscriptions, payments, promo codes → include `@subscription-payments`
+- If a task touches push notifications → include `@fcm-notifications`
+- If a task is within the Sakani project → ALWAYS include `@sakani-conventions`
+- Multiple skills can apply to one plan (e.g., nestjs-backend + auth-rbac + sakani-conventions)
 - Skill patterns are MANDATORY — they represent Fawzi's design standards, not suggestions
 - If no skill matches, proceed without skill context (don't force it)
 

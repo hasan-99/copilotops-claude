@@ -77,6 +77,70 @@ Provide a phase number to start testing (e.g., /qualia:verify-work 4)
 Continue to `create_uat_file`.
 </step>
 
+<step name="run_automated_tests">
+**Run automated tests before manual UAT:**
+
+Check if test infrastructure exists:
+
+```bash
+# Check for test runner
+ls package.json 2>/dev/null && grep -q '"test"' package.json && echo "HAS_TESTS=true" || echo "HAS_TESTS=false"
+
+# Check for e2e tests
+ls playwright.config.* cypress.config.* 2>/dev/null && echo "HAS_E2E=true" || echo "HAS_E2E=false"
+```
+
+**If HAS_TESTS=true:**
+
+```bash
+npm test 2>&1 | tail -30
+```
+
+Report results:
+```
+## Automated Tests
+
+**Unit/Integration:** {X} passed, {Y} failed, {Z} skipped
+{If failures: list failing test names}
+```
+
+**If HAS_E2E=true:**
+
+```bash
+npx playwright test 2>&1 | tail -30
+# OR: npx cypress run 2>&1 | tail -30
+```
+
+Report results:
+```
+**E2E Tests:** {X} passed, {Y} failed
+{If failures: list failing test names}
+```
+
+**If tests fail:**
+
+Present to user:
+```
+⚠ {N} automated test(s) failed. These should be fixed before manual UAT.
+
+Failed tests:
+{list}
+
+Options:
+1. Fix tests first (recommended) — exit and fix, then re-run /qualia:verify-work
+2. Continue to manual UAT anyway — test failures will be noted in UAT.md
+```
+
+Use AskUserQuestion with those 2 options.
+
+If "Fix tests first": Exit with guidance.
+If "Continue": Note failures in UAT.md header and proceed to find_summaries.
+
+**If HAS_TESTS=false:**
+
+Skip silently — no test infrastructure to run. Proceed to find_summaries.
+</step>
+
 <step name="find_summaries">
 **Find what to test:**
 
@@ -317,8 +381,8 @@ Present summary:
 ```
 All tests passed. Ready to continue.
 
-- `/qualia:plan-phase {next}` — Plan next phase
-- `/qualia:execute-phase {next}` — Execute next phase
+- `/clear` then `/qualia:plan-phase {next}` — Plan next phase
+- `/clear` then `/qualia:execute-phase {next}` — Execute next phase
 ```
 </step>
 

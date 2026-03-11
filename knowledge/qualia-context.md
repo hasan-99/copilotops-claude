@@ -3,13 +3,13 @@
 
 ## Project Inventory
 
-### Websites (13) — `~/Projects/Live-Projects/`
+### Websites (13) — `~/Projects/live/`
 | Project | Status | Supabase | Hosting | Notes |
 |---------|--------|----------|---------|-------|
 | qualiafinal | ACTIVE | — | Vercel | Company site |
 | aquador | MAINTENANCE | `hznpuxplqgszbacxzbhv` | Vercel | |
-| glluztech | MAINTENANCE | — | Vercel | Legacy Pages Router — needs migration |
-| inrvo | MAINTENANCE | — | Vercel | CSP headers configured |
+| glluztech | MAINTENANCE | — | Vercel (qualia-glluztech team) | Legacy Pages Router, custom domain glluztech.com, `glluztech.vercel.app` 404s but glluztech.com works |
+| inrvo | REFACTORING | — | Vercel | CSP headers configured, currently being refactored |
 | aandnglobal | DORMANT | — | — | |
 | urban | DORMANT | — | — | |
 | znso | DORMANT | — | — | |
@@ -31,10 +31,10 @@
 | timo | DEV | `qgaqvkmqterlljbegniu` | OpenRouter | MVP, missing API keys |
 | sigatalachana | DEV | — | Claude Opus 4.5 | Python agent (NOT web) |
 
-### Voice (2) — `~/Projects/voice/`
+### Voice (2) — `~/Projects/live/`
 | Project | Status | Provider | Hosting | Supabase |
 |---------|--------|----------|---------|----------|
-| armenius | MAINTENANCE | ElevenLabs | Cloudflare Workers | — |
+| armenius | MAINTENANCE | ElevenLabs | Cloudflare Workers (webhook) + Vercel (widget) | — |
 | under | ACTIVE | Retell AI | Vercel | `vvppyijxpgeeijiozlve` |
 
 ### ERP (ACTIVE) — `~/Projects/websites/qualia/`
@@ -48,7 +48,13 @@ supabase db push --project-ref <ref>       # Migrations
 wrangler deploy                            # Armenius only
 ```
 
+## Key URLs
+- Armenius webhook: `https://armenius-webhook.yellow-mountain-8da2.workers.dev` (old `armenius.fawzi-goussous.workers.dev` is dead)
+- Armenius widget: `https://qualia-widgets.vercel.app`
+- glluztech: custom domain `https://glluztech.com` (NOT `glluztech.vercel.app` — that 404s)
+
 ## Alerts
 - Hammah: SERVICE_ROLE_KEY exposed in .env.local
 - Timo: Empty API keys (won't work)
-- glluztech: Legacy Pages Router
+- glluztech: Legacy Pages Router, Vercel project may be under `qualia-glluztech` team
+- under: HTTP 500 — needs investigation

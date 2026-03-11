@@ -1,9 +1,13 @@
 ---
 name: qualia:debug
 description: Systematic debugging with persistent state across context resets
-argument-hint: [issue description]
+argument-hint: "[--error-analysis] [issue description]"
 allowed-tools:
   - Read
+  - Write
+  - Edit
+  - Glob
+  - Grep
   - Bash
   - Task
   - AskUserQuestion
@@ -15,6 +19,18 @@ Debug issues using scientific method with subagent isolation.
 **Orchestrator role:** Gather symptoms, spawn qualia-debugger agent, handle checkpoints, spawn continuations.
 
 **Why subagent:** Investigation burns context fast (reading files, forming hypotheses, testing). Fresh 200k context per investigation. Main context stays lean for user interaction.
+
+**Modes:**
+- **Default** — Interactive debugging with symptom gathering, hypothesis testing, and subagent isolation.
+- `--error-analysis` — Deep error analysis and resolution. Skips interactive symptom gathering and runs a comprehensive 7-phase analysis directly:
+  1. **Error Pattern Analysis**: Categorize error types, identify root causes, trace error propagation, analyze frequency, correlate with system events
+  2. **Debugging Strategy**: Stack trace analysis, variable state inspection, execution flow tracing, memory dump analysis, race condition detection
+  3. **Error Handling Improvements**: Custom exception classes, error boundary implementation, retry logic with backoff, circuit breaker patterns, graceful degradation
+  4. **Logging Enhancement**: Structured logging setup, correlation ID implementation, log aggregation strategy, debug vs production logging, sensitive data masking
+  5. **Monitoring Integration**: Sentry/Rollbar setup, error alerting rules, error dashboards, trend analysis, SLA impact assessment
+  6. **Recovery Mechanisms**: Automatic recovery procedures, data consistency checks, rollback strategies, state recovery, compensation logic
+  7. **Prevention Strategies**: Input validation, type safety improvements, contract testing, defensive programming, code review checklist
+  Provides specific fixes, preventive measures, long-term reliability improvements, and test cases for each error scenario.
 </objective>
 
 <context>
@@ -31,12 +47,20 @@ ls .planning/debug/*.md 2>/dev/null | grep -v resolved | head -5
 ## 0. Initialize Context
 
 ```bash
-INIT=$(node /home/qualia/.claude/get-shit-done/bin/gsd-tools.js state load)
+INIT=$(node /home/qualia/.claude/get-shit-done/bin/gsd-tools.js state load 2>&1)
+if [ $? -ne 0 ] || echo "$INIT" | grep -q '"error"'; then
+  echo "ERROR: Failed to load state: $INIT"
+  exit 1
+fi
 ```
 
 Extract `commit_docs` from init JSON. Resolve debugger model:
 ```bash
-DEBUGGER_MODEL=$(node /home/qualia/.claude/get-shit-done/bin/gsd-tools.js resolve-model qualia-debugger --raw)
+DEBUGGER_MODEL=$(node /home/qualia/.claude/get-shit-done/bin/gsd-tools.js resolve-model qualia-debugger --raw 2>&1)
+if [ $? -ne 0 ] || [ -z "$DEBUGGER_MODEL" ]; then
+  echo "ERROR: Failed to resolve debugger model: $DEBUGGER_MODEL"
+  exit 1
+fi
 ```
 
 ## 1. Check Active Sessions

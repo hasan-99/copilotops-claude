@@ -1,6 +1,6 @@
 #!/bin/bash
 # Pre-compaction hook — saves context before Claude auto-compacts
-# Preserves: changed files, current task, git state, GSD phase/milestone, project name
+# Preserves: changed files, current task, git state, Qualia phase/milestone, project name
 
 COMPACT_DIR="$HOME/.claude/session-env"
 COMPACT_FILE="$COMPACT_DIR/pre-compact.json"
@@ -19,17 +19,17 @@ fi
 
 [ -z "$GIT_DIFF_FILES" ] && GIT_DIFF_FILES="[]"
 
-# Parse GSD state from .planning/STATE.md if it exists
-GSD_PHASE=""
-GSD_MILESTONE=""
-GSD_TASK=""
-GSD_STATUS=""
+# Parse Qualia state from .planning/STATE.md if it exists
+QUALIA_PHASE=""
+QUALIA_MILESTONE=""
+QUALIA_TASK=""
+QUALIA_STATUS=""
 STATE_FILE="$CWD/.planning/STATE.md"
 if [ -f "$STATE_FILE" ]; then
-    GSD_PHASE=$(grep -m1 "^Phase:" "$STATE_FILE" 2>/dev/null | sed 's/^Phase: *//' || echo "")
-    GSD_MILESTONE=$(grep -m1 "^## Milestone" "$STATE_FILE" 2>/dev/null | sed 's/^## //' || echo "")
-    GSD_STATUS=$(grep -m1 "^Status:" "$STATE_FILE" 2>/dev/null | sed 's/^Status: *//' || echo "")
-    GSD_TASK=$(grep -m1 "^Last activity:" "$STATE_FILE" 2>/dev/null | sed 's/^Last activity: *//' || echo "")
+    QUALIA_PHASE=$(grep -m1 "^Phase:" "$STATE_FILE" 2>/dev/null | sed 's/^Phase: *//' || echo "")
+    QUALIA_MILESTONE=$(grep -m1 "^## Milestone" "$STATE_FILE" 2>/dev/null | sed 's/^## //' || echo "")
+    QUALIA_STATUS=$(grep -m1 "^Status:" "$STATE_FILE" 2>/dev/null | sed 's/^Status: *//' || echo "")
+    QUALIA_TASK=$(grep -m1 "^Last activity:" "$STATE_FILE" 2>/dev/null | sed 's/^Last activity: *//' || echo "")
 fi
 
 cat > "$COMPACT_FILE" << EOF
@@ -39,10 +39,10 @@ cat > "$COMPACT_FILE" << EOF
   "project_name": "$PROJECT_NAME",
   "git_branch": "$GIT_BRANCH",
   "changed_files": $GIT_DIFF_FILES,
-  "gsd_phase": "$GSD_PHASE",
-  "gsd_milestone": "$GSD_MILESTONE",
-  "gsd_status": "$GSD_STATUS",
-  "gsd_task": "$GSD_TASK"
+  "qualia_phase": "$QUALIA_PHASE",
+  "qualia_milestone": "$QUALIA_MILESTONE",
+  "qualia_status": "$QUALIA_STATUS",
+  "qualia_task": "$QUALIA_TASK"
 }
 EOF
 

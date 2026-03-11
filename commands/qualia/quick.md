@@ -1,7 +1,7 @@
 ---
 name: qualia:quick
 description: Execute a quick task with Qualia guarantees (atomic commits, state tracking) but skip optional agents
-argument-hint: "[--no-plan] task description"
+argument-hint: "[--no-plan] [--fix] task description"
 allowed-tools:
   - Read
   - Write
@@ -23,6 +23,14 @@ Quick mode is the same system with a shorter path:
 
 **Flags:**
 - `--no-plan` — Skip the planner entirely. Creates a minimal inline plan and spawns the executor directly. Use for truly trivial tasks (fix a typo, update a string, add a field).
+- `--fix` — Bug fix mode. Enforces minimal-change discipline for targeted bug fixes. Applies these strict rules:
+  1. **Understand First**: Read the error/issue carefully before touching code
+  2. **Minimal Changes**: Only modify what's necessary to fix the bug
+  3. **No Refactoring**: Don't improve unrelated code
+  4. **No New Features**: Just fix the bug, nothing else
+  5. **Locate → Root Cause → Smallest Fix → Verify**: Follow this exact sequence
+  6. **Explain Briefly**: One sentence on what was wrong and how it was fixed
+  When `--fix` is used, `--no-plan` is implied (skip planner, go straight to executor with bug-fix constraints).
 
 Use when: You know exactly what to do and the task is small enough to not need research or verification.
 </objective>

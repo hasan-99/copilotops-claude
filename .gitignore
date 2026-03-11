@@ -20,14 +20,21 @@ plans/
 stats-cache.json
 history.jsonl
 
-# Sensitive (should not exist here, but just in case)
+# Personal / Sensitive — NEVER push
+settings.json
+settings.local.json
 .env*
 *credentials*
 *secret*
 *.pem
 *.key
-config/mcp.json
-settings.local.json
+config/
+cache/
+ide/
+context-states/
+backups/
+plugins/
+knowledge/
 
 # Archive (old rotated files)
 archive/

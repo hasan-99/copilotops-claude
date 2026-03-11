@@ -209,6 +209,55 @@ Task(
 - **`## CHECKPOINT REACHED`:** Present to user, get response, spawn continuation (step 12)
 - **`## PLANNING INCONCLUSIVE`:** Show attempts, offer: Add context / Retry / Manual
 
+## 9.5. Check files_modified Overlap
+
+Before running the plan-checker, scan ALL existing PLAN files across the project for `files_modified` overlap with the new plan(s).
+
+```bash
+# Collect files_modified from the NEW plans in this phase
+NEW_FILES=$(grep -h '^files_modified:' "${PHASE_DIR}"/*-PLAN.md 2>/dev/null | sed 's/^files_modified:\s*//' | tr -d '[]"' | tr ',' '\n' | sed 's/^ *//;s/ *$//' | sort -u)
+
+# Collect files_modified from ALL OTHER phase plans
+OTHER_FILES=$(find .planning/phases -maxdepth 3 -name '*-PLAN.md' -not -path "${PHASE_DIR}/*" 2>/dev/null | while read f; do
+  grep -h '^files_modified:' "$f" 2>/dev/null | sed 's/^files_modified:\s*//' | tr -d '[]"' | tr ',' '\n' | sed 's/^ *//;s/ *$//' | while read file; do
+    echo "$file|$(basename "$(dirname "$f")")|$(basename "$f")"
+  done
+done | sort)
+```
+
+Compare overlaps:
+
+```bash
+# For each file in the new plan, check if it appears in other plans
+OVERLAPS=""
+while IFS= read -r new_file; do
+  [ -z "$new_file" ] && continue
+  MATCHES=$(echo "$OTHER_FILES" | grep "^${new_file}|" || true)
+  if [ -n "$MATCHES" ]; then
+    OVERLAPS="${OVERLAPS}\n- \`${new_file}\` also modified in: $(echo "$MATCHES" | cut -d'|' -f2-3 | tr '\n' ', ')"
+  fi
+done <<< "$NEW_FILES"
+```
+
+**If overlaps found:** Present warning and require user acknowledgment before continuing:
+
+```
+## ⚠ files_modified Overlap Detected
+
+The following files appear in plans from BOTH this phase and other phases:
+
+{OVERLAPS}
+
+This may cause merge conflicts or unintended overwrites during execution.
+```
+
+Use AskUserQuestion:
+- "Acknowledged — proceed to plan verification" (continue to step 10)
+- "Review plans first" (display conflicting plans, then re-ask)
+- "Abort — fix plans manually" (exit)
+
+**If no overlaps:** Continue silently to step 10.
+
 ## 10. Spawn gsd-plan-checker Agent
 
 Display banner:

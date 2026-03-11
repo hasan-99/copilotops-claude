@@ -1,0 +1,23 @@
+{
+  "skill_name": "sakani-conventions",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I need to create the NestJS DTOs and Supabase migration for the credit top-up request feature. Owner submits a top-up with evidence (CliQ screenshot), BM approves or rejects. Create the migration SQL file and the TypeScript types.",
+      "expected_output": "Should produce: migration with correct table schema matching entities.md (idempotency_key, evidence_document_id FK, status enum, etc.), TypeScript types with snake_case DB fields and camelCase TS properties, error handling using the exact SAKANI_ERRORS codes (DUPLICATE_TOPUP_REQUEST, TOPUP_ALREADY_REVIEWED), and the ledger_entry for CREDIT_TOPUP type following append-only rules.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Write the guard invite API endpoint for Sakani. BM invites a guard to the building by phone number. The invite expires after 7 days and is single-use. Only one active guard per building.",
+      "expected_output": "Should produce: NestJS controller/service following monorepo import pattern (@sakani/shared), correct error codes (GUARD_INVITE_EXPIRED, GUARD_INVITE_REVOKED, GUARD_ALREADY_ACTIVE), proper role check (BM_VERIFIED only), idempotency handling, and the API error response shape matching the ApiError interface exactly.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Create the Supabase RLS policies for the ticket table. Owners and tenants can create tickets for their unit. BMs can see all tickets in their building. Guards can see tickets assigned to them. Staff admins can see everything.",
+      "expected_output": "Should produce: RLS policies using auth.uid() with correct role checks against building_role_assignment and unit_membership tables, proper scope enforcement (unit-scoped for owners/tenants, building-scoped for BM/guard, global for staff), and deny-by-default approach (no permissive policies without role check).",
+      "files": []
+    }
+  ]
+}

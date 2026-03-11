@@ -661,6 +661,51 @@ fi
 
 </step>
 
+<step name="production_deploy">
+
+**Deploy the milestone to production before tagging.**
+
+This ensures the git tag marks code that's actually live — not just code that's done locally.
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ Qualia ► PRODUCTION DEPLOY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+**Detect project type from PROJECT.md/package.json:**
+
+| Project Type | Deploy Command |
+|-------------|----------------|
+| Next.js / Vercel | `/ship-website` |
+| AI Agent | `/ship-agent` |
+| Voice Agent | `/ship-voice` |
+| Mobile App (Expo) | `eas build` + `eas submit` |
+| Generic | `/ship` |
+
+Use AskUserQuestion:
+- header: "Deploy"
+- question: "Deploy v{version} to production now?"
+- options:
+  - "Deploy now (Recommended)" — Run the full ship pipeline (quality gates → preview → production → verify)
+  - "Already deployed" — I deployed manually, just tag and archive
+  - "Skip deploy" — Tag and archive without deploying (e.g., staging only)
+
+**If "Deploy now":**
+
+Run the appropriate `/ship-*` command. This handles:
+- Quality gates (tsc, eslint, build)
+- Preview deploy + verification
+- Production deploy
+- Post-deploy verification (HTTP 200, auth, latency, console errors)
+- Supabase migration safety (if applicable)
+
+**If deploy fails:** Stop milestone completion. Fix the issue, re-run `/ship-*`, then resume with `/qualia:complete-milestone`.
+
+**If "Already deployed" or "Skip deploy":** Continue to git_tag.
+
+</step>
+
 <step name="git_tag">
 
 Create git tag:
@@ -727,9 +772,7 @@ Tag: v[X.Y]
 
 **Start Next Milestone** — questioning → research → requirements → roadmap
 
-`/qualia:new-milestone`
-
-<sub>`/clear` first → fresh context window</sub>
+`/clear` then `/qualia:new-milestone`
 
 ---
 ```

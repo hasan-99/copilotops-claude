@@ -21,20 +21,20 @@ if [ -f "$COMPACT_FILE" ]; then
     PROJECT=$(jq -r '.project_name // empty' "$COMPACT_FILE" 2>/dev/null)
     WORKDIR=$(jq -r '.working_directory // empty' "$COMPACT_FILE" 2>/dev/null)
     BRANCH=$(jq -r '.git_branch // empty' "$COMPACT_FILE" 2>/dev/null)
-    PHASE=$(jq -r '.gsd_phase // empty' "$COMPACT_FILE" 2>/dev/null)
-    MILESTONE=$(jq -r '.gsd_milestone // empty' "$COMPACT_FILE" 2>/dev/null)
-    GSD_STATUS=$(jq -r '.gsd_status // empty' "$COMPACT_FILE" 2>/dev/null)
-    GSD_TASK=$(jq -r '.gsd_task // empty' "$COMPACT_FILE" 2>/dev/null)
+    PHASE=$(jq -r '.qualia_phase // .gsd_phase // empty' "$COMPACT_FILE" 2>/dev/null)
+    MILESTONE=$(jq -r '.qualia_milestone // .gsd_milestone // empty' "$COMPACT_FILE" 2>/dev/null)
+    Q_STATUS=$(jq -r '.qualia_status // .gsd_status // empty' "$COMPACT_FILE" 2>/dev/null)
+    Q_TASK=$(jq -r '.qualia_task // .gsd_task // empty' "$COMPACT_FILE" 2>/dev/null)
     CHANGED=$(jq -r '.changed_files | length' "$COMPACT_FILE" 2>/dev/null)
 
     [ -n "$TIMESTAMP" ] && echo "Last compaction: $TIMESTAMP"
     [ -n "$PROJECT" ] && echo "Project: $PROJECT"
     [ -n "$WORKDIR" ] && echo "Directory: $WORKDIR"
     [ -n "$BRANCH" ] && echo "Branch: $BRANCH"
-    [ -n "$PHASE" ] && echo "GSD Phase: $PHASE"
-    [ -n "$MILESTONE" ] && echo "GSD Milestone: $MILESTONE"
-    [ -n "$GSD_STATUS" ] && echo "GSD Status: $GSD_STATUS"
-    [ -n "$GSD_TASK" ] && echo "Last activity: $GSD_TASK"
+    [ -n "$PHASE" ] && echo "Qualia Phase: $PHASE"
+    [ -n "$MILESTONE" ] && echo "Qualia Milestone: $MILESTONE"
+    [ -n "$Q_STATUS" ] && echo "Qualia Status: $Q_STATUS"
+    [ -n "$Q_TASK" ] && echo "Last activity: $Q_TASK"
     [ "$CHANGED" != "0" ] && [ -n "$CHANGED" ] && echo "Uncommitted files: $CHANGED"
 fi
 

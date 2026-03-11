@@ -34,20 +34,32 @@ Normalize phase input in step 1 before any directory lookups.
 ## 0. Initialize Context
 
 ```bash
-INIT=$(node /home/qualia/.claude/get-shit-done/bin/gsd-tools.js init phase-op "$ARGUMENTS")
+INIT=$(node /home/qualia/.claude/get-shit-done/bin/gsd-tools.js init phase-op "$ARGUMENTS" 2>&1)
+if [ $? -ne 0 ] || echo "$INIT" | grep -q '"error"'; then
+  echo "ERROR: Failed to initialize phase context: $INIT"
+  exit 1
+fi
 ```
 
 Extract from init JSON: `phase_dir`, `phase_number`, `phase_name`, `phase_found`, `commit_docs`, `has_research`.
 
 Resolve researcher model:
 ```bash
-RESEARCHER_MODEL=$(node /home/qualia/.claude/get-shit-done/bin/gsd-tools.js resolve-model qualia-phase-researcher --raw)
+RESEARCHER_MODEL=$(node /home/qualia/.claude/get-shit-done/bin/gsd-tools.js resolve-model qualia-phase-researcher --raw 2>&1)
+if [ $? -ne 0 ] || [ -z "$RESEARCHER_MODEL" ]; then
+  echo "ERROR: Failed to resolve researcher model: $RESEARCHER_MODEL"
+  exit 1
+fi
 ```
 
 ## 1. Validate Phase
 
 ```bash
-PHASE_INFO=$(node /home/qualia/.claude/get-shit-done/bin/gsd-tools.js roadmap get-phase "${phase_number}")
+PHASE_INFO=$(node /home/qualia/.claude/get-shit-done/bin/gsd-tools.js roadmap get-phase "${phase_number}" 2>&1)
+if [ $? -ne 0 ] || echo "$PHASE_INFO" | grep -q '"error"'; then
+  echo "ERROR: Failed to get phase info from roadmap: $PHASE_INFO"
+  exit 1
+fi
 ```
 
 **If `found` is false:** Error and exit. **If `found` is true:** Extract `phase_number`, `phase_name`, `goal` from JSON.

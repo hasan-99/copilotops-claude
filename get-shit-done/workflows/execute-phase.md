@@ -294,11 +294,24 @@ Also: `cat {phase_dir}/{phase}-VERIFICATION.md` — full report
 Also: `/qualia:verify-work {X}` — manual testing first
 ```
 
-Gap closure cycle: `/qualia:plan-phase {X} --gaps` reads VERIFICATION.md → creates gap plans with `gap_closure: true` → user runs `/qualia:execute-phase {X} --gaps-only` → verifier re-runs.
+Gap closure cycle: `/qualia:plan-phase {X} --gaps` reads VERIFICATION.md → creates gap plans with `gap_closure: true` → user runs `/qualia:execute-phase {X} --gaps-only` → verifier re-runs automatically (see below).
+
+**Mandatory re-verification after gap closure:**
+
+When executing with `--gaps-only`, after all gap plans complete (aggregate_results), automatically re-run verification — do NOT skip to update_roadmap. The flow is:
+
+1. Gap plans execute via execute_waves
+2. aggregate_results reports completion
+3. verify_phase_goal re-runs (spawn qualia-verifier again)
+4. **If `passed`:** → update_roadmap (phase complete)
+5. **If `gaps_found` again:** Present new gaps, offer another `/qualia:plan-phase {X} --gaps` cycle. **Never mark phase complete with gaps.**
+6. **If `human_needed`:** Present for manual testing as usual
+
+A phase MUST NOT be marked complete in ROADMAP.md until verification returns `passed` or the user explicitly approves after `human_needed`. There is no bypass.
 </step>
 
 <step name="update_roadmap">
-Mark phase complete in ROADMAP.md (date, status).
+Mark phase complete in ROADMAP.md (date, status). **Only reachable when verification status is `passed` or user approved `human_needed` items.**
 
 ```bash
 node /home/qualia/.claude/get-shit-done/bin/gsd-tools.js commit "docs(phase-{X}): complete phase execution" --files .planning/ROADMAP.md .planning/STATE.md .planning/phases/{phase_dir}/*-VERIFICATION.md .planning/REQUIREMENTS.md
@@ -313,9 +326,7 @@ node /home/qualia/.claude/get-shit-done/bin/gsd-tools.js commit "docs(phase-{X})
 
 **Phase {X+1}: {Name}** — {Goal}
 
-`/qualia:plan-phase {X+1}`
-
-<sub>`/clear` first for fresh context</sub>
+`/clear` then `/qualia:plan-phase {X+1}`
 ```
 
 **If milestone complete:**
@@ -324,7 +335,7 @@ MILESTONE COMPLETE!
 
 All {N} phases executed.
 
-`/qualia:complete-milestone`
+`/clear` then `/qualia:complete-milestone`
 ```
 </step>
 

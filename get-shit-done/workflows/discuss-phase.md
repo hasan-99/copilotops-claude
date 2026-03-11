@@ -370,9 +370,7 @@ Created: .planning/phases/${PADDED_PHASE}-${SLUG}/${PADDED_PHASE}-CONTEXT.md
 
 **Phase ${PHASE}: [Name]** — [Goal from ROADMAP.md]
 
-`/qualia:plan-phase ${PHASE}`
-
-<sub>`/clear` first → fresh context window</sub>
+`/clear` then `/qualia:plan-phase ${PHASE}`
 
 ---
 

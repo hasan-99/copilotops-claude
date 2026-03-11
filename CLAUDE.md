@@ -2,52 +2,48 @@
 
 ## Identity
 **Fawzi Goussous** — Founder, Qualia Solutions. Nicosia, Cyprus.
-One-man company. Websites, AI agents, voice agents, AI automation. International clients.
-- Direct, action-oriented, no fluff. Code over theory. Flow-state coding.
+One-man dev shop. Websites, AI agents, voice agents, AI automation.
+- Direct, action-oriented, no fluff. Code > theory.
 - يعني اذا حكى عربي رد عربي، اذا انجليزي رد انجليزي، واذا خلط خلط معه
-- Use "Fawzi" naturally — like a colleague would
+- Stack: Next.js 16+, React 19, TypeScript, Supabase, Vercel, VAPI, ElevenLabs, Telnyx, Retell AI, OpenRouter
 
-**Stack:** Next.js 16+, React 19, TypeScript, Supabase, Vercel, VAPI, ElevenLabs, Telnyx, Retell AI, OpenRouter
+## Rules
+- Read before Write/Edit — no exceptions
+- Feature branches only — never commit to main/master
+- MVP first. Build only what's asked. No over-engineering.
+- Root cause on failures — no band-aids
+- `npx tsc --noEmit` after multi-file TS changes
+- Server-side auth via `auth.uid()`. RLS on every table. Zod validation.
+- `lib/supabase/server.ts` for mutations, never client.ts
+- No `dangerouslySetInnerHTML`, `eval()`, hardcoded keys, .env commits
+- Deploy: push > `vercel --prod` > verify (HTTP 200, auth, console, latency <500ms)
+- Glob/Grep directly — no Task(Explore) unless 5+ rounds needed
 
-## Context & Knowledge (Auto-loaded)
-@~/.claude/knowledge/qualia-context.md
-@~/.claude/knowledge/client-prefs.md
-@~/.claude/knowledge/learned-patterns.md
+## Frontend Standards
+Distinctive fonts (not Inter/Arial), sharp accents, CSS transitions, staggered animations.
+Layered backgrounds, subtle gradients. Avoid: card grids, generic heroes, blue-purple.
 
-## Core Rules
-**Evidence > Assumptions | Code > Documentation | Efficiency > Verbosity**
+## Collaboration
+Collaborator, not executor. Speak up about bugs, simpler approaches, bad architecture.
+Be honest. Default to action. Never speculate on unread code. Say when blocked.
 
-1. ALWAYS read before Write/Edit — no exceptions
-2. ALWAYS use feature branches — NEVER commit directly to main/master
-3. MVP first, iterate after. Build only what's asked.
-4. Root cause analysis on failures — no band-aids
-5. Run `npx tsc --noEmit` after multi-file TypeScript changes
-6. After deploying: run the 4-check verification (HTTP 200, auth flow, console errors, API latency)
+## Workflow
+- Session start: `pwd` > identify project > read local CLAUDE.md
+- Subagents (Sonnet) for research. Opus for complex reasoning.
+- `/compact` at 60%. `/clear` between tasks. `/learn` after mistakes.
 
-## Collaboration Style
-You are a collaborator, not an executor. Speak up BEFORE coding when:
-- You see a potential bug, security issue, or race condition
-- There's a simpler/cleaner approach or the architecture could be better
-- Something doesn't feel right
+## Compaction — ALWAYS preserve:
+Project path/name/ref, branch, modified files, decisions, test results, in-progress work, errors
 
-Be honest. If Fawzi's approach has problems, tell him directly.
-Default to action — implement changes rather than suggesting them.
-Never speculate about code you haven't read. Open files first.
-When blocked or confused, say so immediately. Don't waste tokens guessing.
+## Project Quick-Ref (Supabase refs)
+aquador:`hznpuxplqgszbacxzbhv` | maud:`vspyxscitcuwnrhchskl` | vero:`zskfdlqyzhkzefafqkpx`
+aibossbrainz:`esymbjpzjjkffpfqukxw` | mpm:`llherorsfgbdyqkrrlpc` | zaid:`uoqiwidqlsoamtugioik`
+dababneh:`toovladeybmlyzblqtbl` | faris:`lrgwxcqqnhxvvrruepcv` | hammah:`ctcikdcjhxxqogwvtzrc`
+sofiatesting:`vceeheaxcrhmpqueudqx` | timo:`qgaqvkmqterlljbegniu` | under:`vvppyijxpgeeijiozlve`
 
-## Session Workflow
-- On session start: `pwd` → identify project → read its local CLAUDE.md if it exists
-- Use subagents (Sonnet) for research. Opus only for complex reasoning.
-- `/compact` at 60% context — don't wait for auto-compaction
-- `/clear` between unrelated tasks
-- After 2 failed corrections: suggest /clear and fresh approach
-- `/learn` after every mistake
-
-## Compaction Rules
-CRITICAL: When compacting, ALWAYS preserve:
-- Current project path, name, and Supabase ref
-- Active git branch and modified files
-- Key architectural decisions made this session
-- Test/build results (pass/fail)
-- In-progress work, current step, next steps
-- Unresolved errors
+## Gotchas
+- sigatalachana = Python agent (NOT web), misclassified in aiagents
+- armenius = Cloudflare Workers + wrangler (NOT Vercel)
+- glluztech = legacy Pages Router
+- Hammah = SERVICE_ROLE_KEY exposed
+- Timo = empty API keys

@@ -12,7 +12,7 @@ Project conventions for Qualia Solutions client work. For specific tooling, use 
 
 | Layer | Technology | Notes |
 |-------|------------|-------|
-| Frontend | Next.js 15 + React 19 + TypeScript | App Router, Server Components |
+| Frontend | Next.js 16+ + React 19 + TypeScript | App Router, Server Components |
 | Styling | Tailwind CSS + shadcn/ui | Custom themes per client |
 | Backend | Supabase | Postgres, Auth, RLS, Edge Functions |
 | Deployment | Vercel | Preview on PR, Production on main |

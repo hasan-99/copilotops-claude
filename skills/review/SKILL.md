@@ -206,3 +206,11 @@ HIGH:
 
 ### Output
 Severity-scored findings with exact `file:line` references and fix recommendations.
+
+---
+
+## Deploy Gate
+
+Any CRITICAL or HIGH finding from `/review` is a **deploy blocker**. The `/deploy-verify` skill checks for unresolved review findings before running its 8-point verification. If you haven't run `/review` before deploying, `/deploy-verify` will flag it as a warning.
+
+Workflow: `/review` → fix findings → `/ship` (which triggers `/deploy-verify` automatically)
