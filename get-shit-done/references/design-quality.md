@@ -6,7 +6,7 @@ When building frontend components (.tsx, .jsx, .css, .scss, styled-components, T
 
 ### Build-Time Standards (apply while coding)
 
-**From `/frontend-design`:**
+**From `frontend-master` skill:**
 - Distinctive fonts (not Inter/Arial/system defaults)
 - Cohesive color palette with sharp accents
 - Layered backgrounds, subtle gradients

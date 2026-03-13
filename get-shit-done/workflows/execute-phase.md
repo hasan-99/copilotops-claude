@@ -116,6 +116,7 @@ Execute each wave in sequence. Within a wave: parallel if `PARALLELIZATION=true`
    IS_FRONTEND=$(echo "$PLAN_CONTENT" | grep -qiE '\.(tsx|jsx|css|scss)|frontend|ui|component|page|layout|dashboard|form|modal' && echo "true" || echo "false")
    if [ "$IS_FRONTEND" = "true" ]; then
      DESIGN_CONTEXT=$(cat /home/qualia/.claude/get-shit-done/references/design-quality.md 2>/dev/null)
+     FRONTEND_SKILL=$(cat /home/qualia/.claude/skills/frontend-master/SKILL.md 2>/dev/null)
    fi
    ```
 
@@ -157,17 +158,12 @@ Execute each wave in sequence. Within a wave: parallel if `PARALLELIZATION=true`
 
    ```
    <design_quality>
-   This plan involves frontend work. Apply design quality standards INLINE while building — not as a separate pass.
+   This plan involves frontend work. Use the frontend-master skill as your primary design guide.
 
+   {frontend_skill}
+
+   Build-time standards summary:
    {design_context}
-
-   Key rules:
-   - Distinctive fonts, cohesive colors, layered backgrounds — never generic
-   - Consistent spacing (8px grid), border-radius, shadows, color tokens
-   - Handle: empty states, loading states, error states, text overflow
-   - Clear copy: buttons describe actions, errors explain fixes
-   - Style all interactive states: hover, focus, active, disabled
-   - CSS transitions on interactive elements (150-300ms), staggered animations for lists
    </design_quality>
    ```
 
@@ -287,57 +283,119 @@ fi
 
 **If no frontend files:** Skip to verify_phase_goal.
 
-**If frontend files exist:** Load skill content and spawn a design quality agent.
+**If frontend files exist:** Run the impeccable diagnostic-then-fix flow.
+
+### Step 1: Run /critique diagnostic
 
 ```bash
 # Content must be inlined — @ syntax doesn't work across Task() boundaries
 CRITIQUE_SKILL=$(cat /home/qualia/.claude/skills/critique/SKILL.md 2>/dev/null)
-POLISH_SKILL=$(cat /home/qualia/.claude/skills/polish/SKILL.md 2>/dev/null)
-HARDEN_SKILL=$(cat /home/qualia/.claude/skills/harden/SKILL.md 2>/dev/null)
-ANIMATE_SKILL=$(cat /home/qualia/.claude/skills/animate/SKILL.md 2>/dev/null)
-DESIGN_REF=$(cat /home/qualia/.claude/get-shit-done/references/design-quality.md 2>/dev/null)
+FRONTEND_SKILL=$(cat /home/qualia/.claude/skills/frontend-master/SKILL.md 2>/dev/null)
 ```
 
 ```
 Task(
-  prompt="You are a design quality reviewer. Review and improve all frontend files changed in this phase.
+  prompt="You are a design director reviewing frontend work. Run a /critique diagnostic on all changed files.
 
-<design_skills>
-Apply these skills in order:
-
-1. CRITIQUE — Evaluate: visual hierarchy, spacing consistency, color usage, typography, component states
+<skill>
 {critique_skill}
+</skill>
 
-2. POLISH — Fix: alignment, spacing inconsistencies, missing hover/focus states, visual rhythm
-{polish_skill}
-
-3. HARDEN — Add: text overflow handling, empty states, loading states, error states, long content resilience
-{harden_skill}
-
-4. ANIMATE — Add: CSS transitions on interactive elements, staggered entrance animations, smooth page transitions
-{animate_skill}
-
-Design reference:
-{design_ref}
-</design_skills>
+<frontend_master>
+{frontend_skill}
+</frontend_master>
 
 <files_to_review>
 ${FRONTEND_FILES}
 </files_to_review>
 
 <rules>
-- Read each file before modifying — understand context first
-- Only modify files in the list above
-- Do NOT restructure or refactor logic — only design quality improvements
-- Commit changes as: style(${PHASE_NUMBER}): design quality pass — [what was improved]
-- If everything already meets standards, commit nothing and report 'No design improvements needed'
-- Focus on what a design director would catch: inconsistent spacing, missing states, generic look, unclear copy, missing transitions
+- Read each file before reviewing
+- Follow the critique skill exactly: AI slop detection, visual hierarchy, information architecture, emotional resonance, states, typography, color, microcopy
+- For each issue, specify which command to run (from the Priority Issues > Command field)
+- Do NOT fix anything — only diagnose and recommend
+- Output a structured report with:
+  1. Anti-Patterns Verdict (pass/fail)
+  2. Priority Issues (each with: what, why, fix, command)
+  3. Minor Observations
+- If everything looks good, report 'Design quality meets standards — no fixes needed'
 </rules>",
-  subagent_type="qualia-executor"
+  subagent_type="qualia-executor",
+  description="Design critique for Phase ${PHASE_NUMBER}"
 )
 ```
 
-Report what was improved (or that no improvements were needed) before proceeding.
+### Step 2: Parse critique and run recommended commands
+
+Read the critique report. If it says "no fixes needed" — skip to verify_phase_goal.
+
+If issues were found, collect the unique recommended commands from the report (e.g., `/polish`, `/harden`, `/animate`, `/normalize`, `/clarify`, `/bolder`, `/distill`, etc.).
+
+For each recommended command, load the corresponding skill and spawn a fix agent:
+
+```bash
+# Load only the skills the critique recommended
+# Example: if critique recommended /polish and /harden
+for SKILL_NAME in ${RECOMMENDED_COMMANDS}; do
+  SKILL_CONTENT=$(cat /home/qualia/.claude/skills/${SKILL_NAME}/SKILL.md 2>/dev/null)
+  # Only proceed if skill file exists
+  if [ -n "$SKILL_CONTENT" ]; then
+    echo "Loading skill: ${SKILL_NAME}"
+  fi
+done
+```
+
+Spawn a single fix agent with all recommended skills loaded:
+
+```
+Task(
+  prompt="You are a design quality fixer. Apply the recommended fixes from the critique report.
+
+<critique_report>
+{critique_output}
+</critique_report>
+
+<skills>
+{For each recommended command, inline its SKILL.md content here}
+</skills>
+
+<frontend_master>
+{frontend_skill}
+</frontend_master>
+
+<files_to_fix>
+${FRONTEND_FILES}
+</files_to_fix>
+
+<rules>
+- Read each file before modifying — understand context first
+- Only modify files in the list above
+- Only fix what the critique identified — do not refactor or restructure logic
+- Apply each recommended skill to address its specific issues
+- Commit changes as: style(${PHASE_NUMBER}): design quality — [summary of what was fixed]
+- If a recommended fix would require architectural changes, skip it and note why
+</rules>",
+  subagent_type="qualia-executor",
+  description="Design fixes for Phase ${PHASE_NUMBER}"
+)
+```
+
+### Step 3: Report
+
+```
+---
+## Design Quality Pass
+
+**Critique:** {pass/fail verdict}
+**Issues found:** {N}
+**Commands applied:** {list of skills that ran}
+**Fixed:** {summary of changes}
+
+{If issues were skipped: list why}
+---
+```
+
+Report before proceeding to verify_phase_goal.
 </step>
 
 <step name="verify_phase_goal">

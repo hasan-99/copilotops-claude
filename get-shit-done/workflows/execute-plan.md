@@ -70,19 +70,24 @@ If `IS_FRONTEND=true`: load design quality standards.
 ```bash
 if [ "$IS_FRONTEND" = "true" ]; then
   DESIGN_REF=$(cat /home/qualia/.claude/get-shit-done/references/design-quality.md 2>/dev/null)
+  FRONTEND_SKILL=$(cat /home/qualia/.claude/skills/frontend-master/SKILL.md 2>/dev/null)
 fi
 ```
 
-**For Pattern A/B subagents:** When `IS_FRONTEND=true`, append a `<design_quality>` block to the subagent prompt containing `DESIGN_REF` content plus the per-task checklist:
+**For Pattern A/B subagents:** When `IS_FRONTEND=true`, append a `<design_quality>` block to the subagent prompt containing the frontend-master skill and design ref:
 
 ```
 <design_quality>
-Apply these design standards INLINE while building — not as a separate pass.
+This plan involves frontend work. Use the frontend-master skill as your primary design guide.
 
+{FRONTEND_SKILL content inlined here}
+
+Build-time standards summary:
 {DESIGN_REF content inlined here}
 
 Per-task checklist before committing frontend code:
-1. Distinctive or generic? 2. Spacing/colors consistent? 3. Empty/loading/error states?
+1. Distinctive or generic? (check against frontend-master DON'Ts)
+2. Spacing/colors consistent? 3. Empty/loading/error states?
 4. Copy clear to first-time user? 5. Interactive states styled? 6. CSS transitions on interactions?
 </design_quality>
 ```

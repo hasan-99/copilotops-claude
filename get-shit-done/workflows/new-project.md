@@ -932,6 +932,33 @@ Walk through each needed service:
 **If "Skip for now":**
 Note in STATE.md: `env_setup: pending` so future commands can warn.
 
+## 9.5. Design Context (frontend projects)
+
+**Check if project involves frontend work:**
+
+```bash
+# Detect from roadmap, requirements, or project type
+HAS_FRONTEND=$(grep -qiE 'website|landing|dashboard|ui|frontend|page|component|SaaS|web app' .planning/PROJECT.md .planning/ROADMAP.md 2>/dev/null && echo "true" || echo "false")
+```
+
+**If `HAS_FRONTEND` is true:** Run `/teach-impeccable` to gather design context.
+
+Display banner:
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ Qualia ► DESIGN CONTEXT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+Execute the teach-impeccable skill:
+1. Read `/home/qualia/.claude/skills/teach-impeccable/SKILL.md`
+2. Follow its process: scan codebase for existing design patterns, ask UX-focused questions, write Design Context section
+3. The skill persists design context to the project's CLAUDE.md (or `.claude/` config)
+
+This runs ONCE per project. All subsequent `/qualia:execute-phase` runs will have the design context available for the frontend-master skill and the diagnostic design pass.
+
+**If `HAS_FRONTEND` is false:** Skip silently.
+
 **Commit setup:**
 ```bash
 node /home/qualia/.claude/get-shit-done/bin/gsd-tools.js commit "chore: environment setup" --files .env.local supabase/config.toml
@@ -1015,6 +1042,7 @@ Present completion with next steps:
 - [ ] ROADMAP.md created with phases, requirement mappings, success criteria
 - [ ] STATE.md initialized
 - [ ] REQUIREMENTS.md traceability updated
+- [ ] If frontend project: `/teach-impeccable` run to set design context
 - [ ] User knows next step is `/qualia:discuss-phase 1`
 
 **Atomic commits:** Each phase commits its artifacts immediately. If context is lost, artifacts persist.
