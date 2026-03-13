@@ -44,6 +44,7 @@ For each frontend task, before committing ask:
 3. What happens with no data? Too much data? An error?
 4. Is the copy clear to a first-time user?
 5. Are interactive elements (hover, focus, active, disabled) styled?
+6. Are CSS transitions present on interactions (150-300ms)?
 
 ### Detection
 

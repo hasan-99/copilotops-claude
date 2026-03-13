@@ -175,7 +175,6 @@ Execute each wave in sequence. Within a wave: parallel if `PARALLELIZATION=true`
    ```
    - [ ] Frontend components meet design quality standards (no generic look, states handled, copy is clear, transitions present)
    ```
-   ```
 
 3. **Wait for all agents in wave to complete.**
 
@@ -295,6 +294,7 @@ fi
 CRITIQUE_SKILL=$(cat /home/qualia/.claude/skills/critique/SKILL.md 2>/dev/null)
 POLISH_SKILL=$(cat /home/qualia/.claude/skills/polish/SKILL.md 2>/dev/null)
 HARDEN_SKILL=$(cat /home/qualia/.claude/skills/harden/SKILL.md 2>/dev/null)
+ANIMATE_SKILL=$(cat /home/qualia/.claude/skills/animate/SKILL.md 2>/dev/null)
 DESIGN_REF=$(cat /home/qualia/.claude/get-shit-done/references/design-quality.md 2>/dev/null)
 ```
 
@@ -313,6 +313,9 @@ Apply these skills in order:
 
 3. HARDEN — Add: text overflow handling, empty states, loading states, error states, long content resilience
 {harden_skill}
+
+4. ANIMATE — Add: CSS transitions on interactive elements, staggered entrance animations, smooth page transitions
+{animate_skill}
 
 Design reference:
 {design_ref}
