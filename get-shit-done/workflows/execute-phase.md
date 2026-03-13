@@ -112,6 +112,11 @@ Execute each wave in sequence. Within a wave: parallel if `PARALLELIZATION=true`
    PLAN_CONTENT=$(cat "{plan_path}")
    STATE_CONTENT=$(cat .planning/STATE.md)
    CONFIG_CONTENT=$(cat .planning/config.json 2>/dev/null)
+   # Content must be inlined — @ syntax doesn't work across Task() boundaries
+   EXECUTE_PLAN_WF=$(cat /home/qualia/.claude/get-shit-done/workflows/execute-plan.md)
+   SUMMARY_TMPL=$(cat /home/qualia/.claude/get-shit-done/templates/summary.md)
+   CHECKPOINTS_REF=$(cat /home/qualia/.claude/get-shit-done/references/checkpoints.md)
+   TDD_REF=$(cat /home/qualia/.claude/get-shit-done/references/tdd.md)
    # Detect if plan involves frontend work
    IS_FRONTEND=$(echo "$PLAN_CONTENT" | grep -qiE '\.(tsx|jsx|css|scss)|frontend|ui|component|page|layout|dashboard|form|modal' && echo "true" || echo "false")
    if [ "$IS_FRONTEND" = "true" ]; then
@@ -129,10 +134,10 @@ Execute each wave in sequence. Within a wave: parallel if `PARALLELIZATION=true`
    </objective>
 
    <execution_context>
-   @/home/qualia/.claude/get-shit-done/workflows/execute-plan.md
-   @/home/qualia/.claude/get-shit-done/templates/summary.md
-   @/home/qualia/.claude/get-shit-done/references/checkpoints.md
-   @/home/qualia/.claude/get-shit-done/references/tdd.md
+   {execute_plan_wf}
+   {summary_tmpl}
+   {checkpoints_ref}
+   {tdd_ref}
    </execution_context>
 
    <context>

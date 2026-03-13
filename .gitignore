@@ -1,5 +1,5 @@
 # Ephemeral data (large, regenerated)
-projects/
+/projects/
 file-history/
 plugins/cache/
 statsig/
