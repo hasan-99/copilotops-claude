@@ -112,6 +112,11 @@ Execute each wave in sequence. Within a wave: parallel if `PARALLELIZATION=true`
    PLAN_CONTENT=$(cat "{plan_path}")
    STATE_CONTENT=$(cat .planning/STATE.md)
    CONFIG_CONTENT=$(cat .planning/config.json 2>/dev/null)
+   # Detect if plan involves frontend work
+   IS_FRONTEND=$(echo "$PLAN_CONTENT" | grep -qiE '\.(tsx|jsx|css|scss)|frontend|ui|component|page|layout|dashboard|form|modal' && echo "true" || echo "false")
+   if [ "$IS_FRONTEND" = "true" ]; then
+     DESIGN_CONTEXT=$(cat /home/qualia/.claude/get-shit-done/references/design-quality.md 2>/dev/null)
+   fi
    ```
 
    Each agent prompt:
@@ -140,11 +145,29 @@ Execute each wave in sequence. Within a wave: parallel if `PARALLELIZATION=true`
    {config_content}
    </context>
 
+   {IF IS_FRONTEND}
+   <design_quality>
+   This plan involves frontend work. Apply design quality standards INLINE while building — not as a separate pass. Every frontend component must meet these standards before committing.
+
+   {design_context}
+
+   Key rules:
+   - Distinctive fonts, cohesive colors, layered backgrounds — never generic
+   - Consistent spacing (8px grid), border-radius, shadows, color tokens
+   - Handle: empty states, loading states, error states, text overflow
+   - Clear copy: buttons describe actions, errors explain fixes
+   - Style all interactive states: hover, focus, active, disabled
+   </design_quality>
+   {/IF}
+
    <success_criteria>
    - [ ] All tasks executed
    - [ ] Each task committed individually
    - [ ] SUMMARY.md created in plan directory
    - [ ] STATE.md updated with position and decisions
+   {IF IS_FRONTEND}
+   - [ ] Frontend components meet design quality standards (no generic look, states handled, copy is clear)
+   {/IF}
    </success_criteria>
    ```
 
@@ -235,6 +258,51 @@ After all waves:
 ### Issues Encountered
 [Aggregate from SUMMARYs, or "None"]
 ```
+</step>
+
+<step name="design_polish_pass">
+After all waves complete, check if this phase produced frontend work.
+
+```bash
+FRONTEND_FILES=$(git diff --name-only $(git log --oneline --all --grep="${PHASE_NUMBER}-01" --reverse | head -1 | cut -d' ' -f1)^..HEAD 2>/dev/null | grep -E '\.(tsx|jsx|css|scss)$' | head -20)
+```
+
+**If no frontend files:** Skip to verify_phase_goal.
+
+**If frontend files exist:** Spawn a design quality agent to review and fix.
+
+```
+Task(
+  prompt="You are a design quality reviewer. Review and improve all frontend files changed in this phase.
+
+<design_skills>
+Load and apply these skills in order:
+1. /critique — Evaluate: visual hierarchy, spacing consistency, color usage, typography, component states
+2. /polish — Fix: alignment, spacing inconsistencies, missing hover/focus states, visual rhythm
+3. /harden — Add: text overflow handling, empty states, loading states, error states, long content resilience
+
+@/home/qualia/.claude/skills/critique/SKILL.md
+@/home/qualia/.claude/skills/polish/SKILL.md
+@/home/qualia/.claude/skills/harden/SKILL.md
+@/home/qualia/.claude/get-shit-done/references/design-quality.md
+</design_skills>
+
+<files_to_review>
+${FRONTEND_FILES}
+</files_to_review>
+
+<rules>
+- Only modify files in the list above
+- Do NOT restructure or refactor logic — only design quality improvements
+- Commit changes as: style(${PHASE_NUMBER}): design quality pass — [what was improved]
+- If everything already meets standards, commit nothing and report 'No design improvements needed'
+- Focus on what a design director would catch: inconsistent spacing, missing states, generic look, unclear copy
+</rules>",
+  subagent_type="qualia-executor"
+)
+```
+
+Report what was improved (or that no improvements were needed) before proceeding.
 </step>
 
 <step name="verify_phase_goal">
