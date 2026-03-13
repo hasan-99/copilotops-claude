@@ -58,6 +58,38 @@ PLAN_START_EPOCH=$(date +%s)
 ```
 </step>
 
+<step name="detect_frontend">
+Check if this plan involves frontend work. Runs before parse_segments so all execution patterns (A/B/C) have this context.
+
+```bash
+grep -iE '\.(tsx|jsx|css|scss)|frontend|ui|component|page|layout|dashboard|form|modal|navigation|landing' "{plan_path}" > /dev/null 2>&1 && IS_FRONTEND=true || IS_FRONTEND=false
+```
+
+If `IS_FRONTEND=true`: load design quality standards.
+
+```bash
+if [ "$IS_FRONTEND" = "true" ]; then
+  DESIGN_REF=$(cat /home/qualia/.claude/get-shit-done/references/design-quality.md 2>/dev/null)
+fi
+```
+
+**For Pattern A/B subagents:** When `IS_FRONTEND=true`, append a `<design_quality>` block to the subagent prompt containing `DESIGN_REF` content plus the per-task checklist:
+
+```
+<design_quality>
+Apply these design standards INLINE while building — not as a separate pass.
+
+{DESIGN_REF content inlined here}
+
+Per-task checklist before committing frontend code:
+1. Distinctive or generic? 2. Spacing/colors consistent? 3. Empty/loading/error states?
+4. Copy clear to first-time user? 5. Interactive states styled? 6. CSS transitions on interactions?
+</design_quality>
+```
+
+**For Pattern C (main context):** Standards apply directly during the execute step.
+</step>
+
 <step name="parse_segments">
 ```bash
 grep -n "type=\"checkpoint" .planning/phases/XX-name/{phase}-{plan}-PLAN.md
@@ -126,35 +158,17 @@ ls .planning/phases/*/SUMMARY.md 2>/dev/null | sort -r | head -2 | tail -1
 If previous SUMMARY has unresolved "Issues Encountered" or "Next Phase Readiness" blockers: AskUserQuestion(header="Previous Issues", options: "Proceed anyway" | "Address first" | "Review previous").
 </step>
 
-<step name="detect_frontend">
-Check if this plan involves frontend work:
-
-```bash
-grep -iE '\.(tsx|jsx|css|scss)|frontend|ui|component|page|layout|dashboard|form|modal|navigation|landing' "{plan_path}" > /dev/null 2>&1 && IS_FRONTEND=true || IS_FRONTEND=false
-```
-
-If `IS_FRONTEND=true`: load design quality standards for use during execution.
-
-```bash
-if [ "$IS_FRONTEND" = "true" ]; then
-  DESIGN_REF=$(cat /home/qualia/.claude/get-shit-done/references/design-quality.md 2>/dev/null)
-fi
-```
-
-These standards apply **inline while building** — not as a separate pass. Every frontend task should produce code that meets the design quality checklist before committing.
-</step>
-
 <step name="execute">
 Deviations are normal — handle via rules below.
 
 1. Read @context files from prompt
 2. If `IS_FRONTEND=true`: read design quality reference and apply standards inline during implementation
 3. Per task:
-   - `type="auto"`: if `tdd="true"` → TDD execution. Implement with deviation rules + auth gates. Verify done criteria. **If frontend task: apply design-quality per-task checklist before committing** (distinctive look, consistent spacing/tokens, empty/loading/error states, clear copy, interactive states). Commit (see task_commit). Track hash for Summary.
+   - `type="auto"`: if `tdd="true"` → TDD execution. Implement with deviation rules + auth gates. Verify done criteria. **If frontend task: apply design-quality per-task checklist before committing** (distinctive look, consistent spacing/tokens, empty/loading/error states, clear copy, interactive states, CSS transitions). Commit (see task_commit). Track hash for Summary.
    - `type="checkpoint:*"`: STOP → checkpoint_protocol → wait for user → continue only after confirmation.
-3. Run `<verification>` checks
-4. Confirm `<success_criteria>` met
-5. Document deviations in Summary
+4. Run `<verification>` checks
+5. Confirm `<success_criteria>` met
+6. Document deviations in Summary
 </step>
 
 <authentication_gates>

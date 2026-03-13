@@ -145,9 +145,19 @@ Execute each wave in sequence. Within a wave: parallel if `PARALLELIZATION=true`
    {config_content}
    </context>
 
-   {IF IS_FRONTEND}
+   <success_criteria>
+   - [ ] All tasks executed
+   - [ ] Each task committed individually
+   - [ ] SUMMARY.md created in plan directory
+   - [ ] STATE.md updated with position and decisions
+   </success_criteria>
+   ```
+
+   **If `IS_FRONTEND` is true**, append this block to the agent prompt before `</success_criteria>`:
+
+   ```
    <design_quality>
-   This plan involves frontend work. Apply design quality standards INLINE while building — not as a separate pass. Every frontend component must meet these standards before committing.
+   This plan involves frontend work. Apply design quality standards INLINE while building — not as a separate pass.
 
    {design_context}
 
@@ -157,18 +167,14 @@ Execute each wave in sequence. Within a wave: parallel if `PARALLELIZATION=true`
    - Handle: empty states, loading states, error states, text overflow
    - Clear copy: buttons describe actions, errors explain fixes
    - Style all interactive states: hover, focus, active, disabled
+   - CSS transitions on interactive elements (150-300ms), staggered animations for lists
    </design_quality>
-   {/IF}
+   ```
 
-   <success_criteria>
-   - [ ] All tasks executed
-   - [ ] Each task committed individually
-   - [ ] SUMMARY.md created in plan directory
-   - [ ] STATE.md updated with position and decisions
-   {IF IS_FRONTEND}
-   - [ ] Frontend components meet design quality standards (no generic look, states handled, copy is clear)
-   {/IF}
-   </success_criteria>
+   And add to success_criteria:
+   ```
+   - [ ] Frontend components meet design quality standards (no generic look, states handled, copy is clear, transitions present)
+   ```
    ```
 
 3. **Wait for all agents in wave to complete.**
@@ -264,27 +270,52 @@ After all waves:
 After all waves complete, check if this phase produced frontend work.
 
 ```bash
-FRONTEND_FILES=$(git diff --name-only $(git log --oneline --all --grep="${PHASE_NUMBER}-01" --reverse | head -1 | cut -d' ' -f1)^..HEAD 2>/dev/null | grep -E '\.(tsx|jsx|css|scss)$' | head -20)
+# Find the earliest commit from this phase across all plan numbering formats
+PHASE_BASE=$(git log --oneline --all --grep="(${PHASE_NUMBER}-" --reverse 2>/dev/null | head -1 | cut -d' ' -f1)
+if [ -z "$PHASE_BASE" ]; then
+  # Fallback: try zero-padded format
+  PADDED=$(printf "%02d" "${PHASE_NUMBER}")
+  PHASE_BASE=$(git log --oneline --all --grep="(${PADDED}-" --reverse 2>/dev/null | head -1 | cut -d' ' -f1)
+fi
+
+if [ -n "$PHASE_BASE" ]; then
+  FRONTEND_FILES=$(git diff --name-only ${PHASE_BASE}^..HEAD 2>/dev/null | grep -E '\.(tsx|jsx|css|scss)$' | head -30)
+else
+  # Last resort: check all uncommitted + recent commits
+  FRONTEND_FILES=$(git diff --name-only HEAD~20..HEAD 2>/dev/null | grep -E '\.(tsx|jsx|css|scss)$' | head -30)
+fi
 ```
 
 **If no frontend files:** Skip to verify_phase_goal.
 
-**If frontend files exist:** Spawn a design quality agent to review and fix.
+**If frontend files exist:** Load skill content and spawn a design quality agent.
+
+```bash
+# Content must be inlined — @ syntax doesn't work across Task() boundaries
+CRITIQUE_SKILL=$(cat /home/qualia/.claude/skills/critique/SKILL.md 2>/dev/null)
+POLISH_SKILL=$(cat /home/qualia/.claude/skills/polish/SKILL.md 2>/dev/null)
+HARDEN_SKILL=$(cat /home/qualia/.claude/skills/harden/SKILL.md 2>/dev/null)
+DESIGN_REF=$(cat /home/qualia/.claude/get-shit-done/references/design-quality.md 2>/dev/null)
+```
 
 ```
 Task(
   prompt="You are a design quality reviewer. Review and improve all frontend files changed in this phase.
 
 <design_skills>
-Load and apply these skills in order:
-1. /critique — Evaluate: visual hierarchy, spacing consistency, color usage, typography, component states
-2. /polish — Fix: alignment, spacing inconsistencies, missing hover/focus states, visual rhythm
-3. /harden — Add: text overflow handling, empty states, loading states, error states, long content resilience
+Apply these skills in order:
 
-@/home/qualia/.claude/skills/critique/SKILL.md
-@/home/qualia/.claude/skills/polish/SKILL.md
-@/home/qualia/.claude/skills/harden/SKILL.md
-@/home/qualia/.claude/get-shit-done/references/design-quality.md
+1. CRITIQUE — Evaluate: visual hierarchy, spacing consistency, color usage, typography, component states
+{critique_skill}
+
+2. POLISH — Fix: alignment, spacing inconsistencies, missing hover/focus states, visual rhythm
+{polish_skill}
+
+3. HARDEN — Add: text overflow handling, empty states, loading states, error states, long content resilience
+{harden_skill}
+
+Design reference:
+{design_ref}
 </design_skills>
 
 <files_to_review>
@@ -292,11 +323,12 @@ ${FRONTEND_FILES}
 </files_to_review>
 
 <rules>
+- Read each file before modifying — understand context first
 - Only modify files in the list above
 - Do NOT restructure or refactor logic — only design quality improvements
 - Commit changes as: style(${PHASE_NUMBER}): design quality pass — [what was improved]
 - If everything already meets standards, commit nothing and report 'No design improvements needed'
-- Focus on what a design director would catch: inconsistent spacing, missing states, generic look, unclear copy
+- Focus on what a design director would catch: inconsistent spacing, missing states, generic look, unclear copy, missing transitions
 </rules>",
   subagent_type="qualia-executor"
 )

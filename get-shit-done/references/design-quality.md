@@ -24,6 +24,12 @@ When building frontend components (.tsx, .jsx, .css, .scss, styled-components, T
 - Error states with clear recovery actions
 - Long content resilience (test with 2x expected text length)
 
+**From `/animate`:**
+- CSS transitions on interactive elements (buttons, cards, links) — 150-300ms
+- Staggered entrance animations for lists and grids
+- Smooth page/section transitions
+- Purposeful motion that guides attention, not decorative
+
 **From `/clarify`:**
 - Button labels describe actions ("Save changes" not "Submit")
 - Error messages explain what went wrong AND how to fix it
