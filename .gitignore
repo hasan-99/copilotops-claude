@@ -38,3 +38,7 @@ knowledge/
 
 # Archive (old rotated files)
 archive/
+
+# Ephemeral session/cache data
+image-cache/
+sessions/
