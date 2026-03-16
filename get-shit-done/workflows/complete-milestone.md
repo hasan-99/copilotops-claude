@@ -449,6 +449,41 @@ Archive requirements for next milestone.
 
 </step>
 
+<step name="generate_changelog">
+
+Generate or update CHANGELOG.md at project root.
+
+```bash
+[ -f CHANGELOG.md ] && echo "EXISTS" || echo "NEW"
+```
+
+**New entry format:**
+```markdown
+## [v{VERSION}] — YYYY-MM-DD
+
+### What Shipped
+- {accomplishment 1 — from extract_accomplishments}
+- {accomplishment 2}
+- {accomplishment 3}
+- {accomplishment 4}
+
+### By Phase
+- Phase {X}: {one-liner from SUMMARY.md}
+- Phase {Y}: {one-liner}
+
+### Stats
+{phases} phases, {plans} plans, {files} files changed, {days} days
+```
+
+**Sources:** Reuse `accomplishments[]` from extract_accomplishments step and phase one-liners from gather_stats.
+
+**If CHANGELOG.md exists:** Prepend new entry (newest first). Keep all previous entries.
+**If new:** Create with `# Changelog\n\n` header then the entry.
+
+Include CHANGELOG.md in the final git commit file list.
+
+</step>
+
 <step name="archive_audit">
 
 Move audit file to archive (if exists). Use init context or check directly:

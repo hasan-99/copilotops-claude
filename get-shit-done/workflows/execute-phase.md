@@ -125,6 +125,27 @@ Execute each wave in sequence. Within a wave: parallel if `PARALLELIZATION=true`
    fi
    ```
 
+   **Resolve domain skill references from plan:**
+
+   ```bash
+   # Extract @skill references from plan
+   SKILL_REFS=$(echo "$PLAN_CONTENT" | grep -oP '@/home/qualia/.claude/skills/[^\s]+/SKILL\.md' | sort -u)
+
+   # Inline each skill's content into domain context
+   DOMAIN_CONTEXT=""
+   for ref in $SKILL_REFS; do
+     SKILL_PATH="${ref#@}"
+     if [ -f "$SKILL_PATH" ]; then
+       SKILL_NAME=$(basename "$(dirname "$SKILL_PATH")")
+       DOMAIN_CONTEXT="${DOMAIN_CONTEXT}
+
+--- Skill: ${SKILL_NAME} ---
+$(cat "$SKILL_PATH")
+"
+     fi
+   done
+   ```
+
    Each agent prompt:
 
    ```
@@ -150,6 +171,12 @@ Execute each wave in sequence. Within a wave: parallel if `PARALLELIZATION=true`
    Config (if exists):
    {config_content}
    </context>
+
+   {If DOMAIN_CONTEXT is non-empty:}
+   <domain_skills>
+   These skill guidelines apply to this plan. Follow these patterns.
+   {DOMAIN_CONTEXT}
+   </domain_skills>
 
    <success_criteria>
    - [ ] All tasks executed
@@ -260,6 +287,13 @@ After all waves:
 ### Plan Details
 1. **03-01**: [one-liner from SUMMARY.md]
 2. **03-02**: [one-liner from SUMMARY.md]
+
+### Test Summary
+If any plan SUMMARY.md mentions test results, aggregate:
+```
+Tests: X passed, Y failed across {N} plans
+```
+If Y > 0, note in Issues Encountered.
 
 ### Issues Encountered
 [Aggregate from SUMMARYs, or "None"]

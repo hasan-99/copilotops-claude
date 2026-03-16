@@ -7,6 +7,41 @@ description: Automate testing for Qualia Solutions projects - runs unit tests, i
 
 Handles all testing operations for your projects.
 
+## Run Tests (canonical reference)
+
+This is the single source of truth for test detection and execution in the Qualia workflow.
+Referenced by: `/qualia-verify-work`, `/ship`, `auto-test.sh` hook.
+
+### Detection
+```bash
+# Unit/Integration
+[ -f package.json ] && grep -q '"test"' package.json && echo "HAS_UNIT=true"
+
+# E2E - Playwright
+ls playwright.config.* 2>/dev/null && echo "HAS_PLAYWRIGHT=true"
+
+# E2E - Cypress
+ls cypress.config.* 2>/dev/null && echo "HAS_CYPRESS=true"
+
+# Python
+[ -f pytest.ini ] || [ -f setup.cfg ] || [ -f pyproject.toml ] && echo "HAS_PYTEST=true"
+```
+
+### Execution Order
+1. Unit/Integration: `npm test` (or `pytest --cov`)
+2. E2E Playwright: `npx playwright test`
+3. E2E Cypress: `npx cypress run`
+4. Report: X passed, Y failed, Z skipped per runner
+
+### Result Format
+```
+Test Results: {runner}
+- Passed: X
+- Failed: Y
+- Skipped: Z
+{If failures: list names}
+```
+
 ## Auto-detect and Run Tests
 
 When you say "run tests", I automatically:

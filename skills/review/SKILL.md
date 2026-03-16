@@ -209,6 +209,40 @@ Severity-scored findings with exact `file:line` references and fix recommendatio
 
 ---
 
+## Persist Results
+
+After generating the review report, write findings to a persistent file:
+
+**Location:** `.planning/REVIEW.md` if `.planning/` exists, otherwise `.review/REVIEW.md` at project root.
+
+**Format:**
+```markdown
+---
+date: YYYY-MM-DD HH:MM
+mode: general|web|ai
+critical_count: N
+high_count: N
+medium_count: N
+low_count: N
+status: clean|has_blockers
+---
+
+# Review — YYYY-MM-DD
+
+## Blockers (CRITICAL + HIGH)
+- [file:line] description (CRITICAL)
+- [file:line] description (HIGH)
+
+## Recommendations (MEDIUM + LOW)
+- [file:line] description (MEDIUM)
+```
+
+**Rules:**
+- `status: has_blockers` when critical_count > 0 OR high_count > 0
+- `status: clean` when critical_count == 0 AND high_count == 0
+- If file exists, prepend new review (keep last 3 reviews, delete older)
+- Confirm: "Review saved to {path}. `/ship` will check this before deploying."
+
 ## Deploy Gate
 
 Any CRITICAL or HIGH finding from `/review` is a **deploy blocker**. The `/deploy-verify` skill checks for unresolved review findings before running its 8-point verification. If you haven't run `/review` before deploying, `/deploy-verify` will flag it as a warning.

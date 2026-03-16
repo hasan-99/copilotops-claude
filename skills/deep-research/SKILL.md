@@ -248,7 +248,8 @@ After presenting the report:
 2. **Deep Dive on Specific Area** - Focus on frontend/backend/security/etc
 3. **Start Fixing Critical Issues** - Begin implementing top priority fixes
 4. **Save Report** - Save to docs/research/YYYY-MM-DD-deep-research.md
-5. **Compare to Specific Standard** - Research against OWASP, 12-factor, etc."
+5. **Compare to Specific Standard** - Research against OWASP, 12-factor, etc.
+6. **Feed into phase planning** - Run `/qualia-research-phase <N>` for phase-specific research that builds on this architectural analysis"
 ```
 
 ## Key Principles

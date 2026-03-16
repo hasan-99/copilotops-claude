@@ -80,42 +80,7 @@ Continue to `create_uat_file`.
 <step name="run_automated_tests">
 **Run automated tests before manual UAT:**
 
-Check if test infrastructure exists:
-
-```bash
-# Check for test runner
-ls package.json 2>/dev/null && grep -q '"test"' package.json && echo "HAS_TESTS=true" || echo "HAS_TESTS=false"
-
-# Check for e2e tests
-ls playwright.config.* cypress.config.* 2>/dev/null && echo "HAS_E2E=true" || echo "HAS_E2E=false"
-```
-
-**If HAS_TESTS=true:**
-
-```bash
-npm test 2>&1 | tail -30
-```
-
-Report results:
-```
-## Automated Tests
-
-**Unit/Integration:** {X} passed, {Y} failed, {Z} skipped
-{If failures: list failing test names}
-```
-
-**If HAS_E2E=true:**
-
-```bash
-npx playwright test 2>&1 | tail -30
-# OR: npx cypress run 2>&1 | tail -30
-```
-
-Report results:
-```
-**E2E Tests:** {X} passed, {Y} failed
-{If failures: list failing test names}
-```
+Follow the canonical test detection and execution from `~/.claude/skills/test-runner/SKILL.md` (Run Tests section).
 
 **If tests fail:**
 
@@ -136,9 +101,9 @@ Use AskUserQuestion with those 2 options.
 If "Fix tests first": Exit with guidance.
 If "Continue": Note failures in UAT.md header and proceed to find_summaries.
 
-**If HAS_TESTS=false:**
+**If no test infrastructure detected:**
 
-Skip silently — no test infrastructure to run. Proceed to find_summaries.
+Skip silently — proceed to find_summaries.
 </step>
 
 <step name="find_summaries">
@@ -378,6 +343,32 @@ Present summary:
 **If issues > 0:** Proceed to `diagnose_issues`
 
 **If issues == 0:**
+
+**Frontend design quality check:**
+
+Detect if this phase includes frontend work:
+```bash
+# Check phase PLAN.md files for frontend signals
+grep -rlE '\.(tsx|css|scss)|components/|app/page|app/layout|Tailwind|className' "$PHASE_DIR"/*-PLAN.md 2>/dev/null && echo "HAS_FRONTEND=true" || echo "HAS_FRONTEND=false"
+```
+
+Also check if phase name/objective contains: UI, frontend, design, component, page, layout, dashboard, form, landing, hero.
+
+**If HAS_FRONTEND=true AND issues == 0:**
+
+```
+All tests passed. This phase includes frontend work.
+
+### Design Quality (recommended before moving on)
+
+1. `/critique` — Design director review (catches AI slop, visual hierarchy issues)
+2. `/polish` — Detail pass (spacing, alignment, consistency)
+3. `/harden` — Edge cases, overflow, i18n robustness
+
+Skip? Just run the next command directly. Otherwise run `/critique` now.
+```
+
+**If HAS_FRONTEND=false:**
 ```
 All tests passed. Ready to continue.
 

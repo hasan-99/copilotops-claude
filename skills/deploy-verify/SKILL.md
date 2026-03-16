@@ -301,12 +301,13 @@ bash ~/.claude/skills/deploy-verify/scripts/verify.sh <URL>
 
 ## Pre-Deploy Review Check
 
-Before running verification, check if a `/review` was completed for the current changes:
+Before running the 8 verification checks, read the review file:
 
-1. Look for CRITICAL or HIGH findings from a recent `/review` run
-2. If unresolved CRITICAL/HIGH findings exist → **WARN** and list them before proceeding
-3. If no `/review` was run → **WARN** with suggestion: "Consider running `/review` before deploying"
-4. This is advisory only — it does not block verification
+1. Check `.planning/REVIEW.md` then `.review/REVIEW.md`
+2. If found: parse frontmatter of the most recent entry
+   - `status: has_blockers` → **WARN** with list of CRITICAL/HIGH findings. Ask user: "Deploy anyway?" or "Fix first?"
+   - `status: clean` → Note "Pre-deploy review: clean" and continue
+3. If not found → **WARN**: "No `/review` found. Consider running `/review` before deploying." (advisory only, not blocking)
 
 Recommended workflow: `/review` → fix findings → `/ship` → (auto-triggers `/deploy-verify`)
 
