@@ -34,6 +34,21 @@ Before starting, make sure you have:
 
 ## Setup (First Time)
 
+### Linux / Mac (Bash)
+
+One-liner (clones and runs setup):
+```bash
+bash <(curl -s https://raw.githubusercontent.com/Qualiasolutions/qualia-claude/main/team-sync/setup.sh)
+```
+
+Or clone first then run:
+```bash
+git clone https://github.com/Qualiasolutions/qualia-claude.git ~/.claude-config-repo
+bash ~/.claude-config-repo/team-sync/setup.sh
+```
+
+**Arch Linux note:** Make sure `git` and `coreutils` are installed (`pacman -S git coreutils`).
+
 ### Windows (PowerShell)
 
 1. Open PowerShell and clone the repo:
@@ -46,17 +61,6 @@ git clone https://github.com/Qualiasolutions/qualia-claude.git $env:USERPROFILE\
 & $env:USERPROFILE\.claude-config-repo\team-sync\setup.ps1
 ```
 
-### Mac / Linux (Bash)
-
-```bash
-bash <(curl -s https://raw.githubusercontent.com/Qualiasolutions/qualia-claude/main/team-sync/setup.sh)
-```
-
-Or if you've already cloned the repo:
-```bash
-bash ~/.claude-config-repo/team-sync/setup.sh
-```
-
 ### After Setup (All Platforms)
 
 1. Open `~/.claude/settings.json` (Windows: `%USERPROFILE%\.claude\settings.json`) and replace every `YOUR_*_HERE` with your actual API keys
@@ -67,14 +71,14 @@ bash ~/.claude-config-repo/team-sync/setup.sh
 
 When the team config gets updated (new skills, rule changes, etc.), pull the latest:
 
+### Linux / Mac (Bash)
+```bash
+bash ~/.claude-config-repo/team-sync/update.sh
+```
+
 ### Windows (PowerShell)
 ```powershell
 & $env:USERPROFILE\.claude-config-repo\team-sync\update.ps1
-```
-
-### Mac / Linux (Bash)
-```bash
-bash ~/.claude-config-repo/team-sync/update.sh
 ```
 
 This will:
