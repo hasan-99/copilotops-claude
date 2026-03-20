@@ -1,0 +1,266 @@
+{
+  "env": {
+    "API_TIMEOUT_MS": "60000",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "0",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "claude-sonnet-4-6",
+    "ENABLE_TOOL_SEARCH": "true",
+    "CLAUDE_CODE_MAX_TOOL_USE_TOKENS": "25000",
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "ZOHO_MCP_KEY": "YOUR_ZOHO_MCP_KEY_HERE",
+    "FIRECRAWL_API_KEY": "YOUR_FIRECRAWL_API_KEY_HERE",
+    "SENTRY_ACCESS_TOKEN": "YOUR_SENTRY_ACCESS_TOKEN_HERE",
+    "SUPABASE_ACCESS_TOKEN": "YOUR_SUPABASE_ACCESS_TOKEN_HERE"
+  },
+  "permissions": {
+    "allow": [
+      "Skill(dev-browser:dev-browser)",
+      "Bash(npx tsx:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx prettier:*)",
+      "Bash(npx eslint:*)",
+      "Bash(npx vitest:*)",
+      "Bash(npx playwright:*)",
+      "Bash(find:*)",
+      "Bash(git:*)",
+      "Bash(gh:*)",
+      "Bash(npm:*)",
+      "Bash(pnpm:*)",
+      "Bash(bun:*)",
+      "Bash(node:*)",
+      "Bash(curl:*)",
+      "Bash(xargs:*)",
+      "Bash(claude:*)",
+      "Bash(supabase:*)",
+      "Bash(vercel:*)",
+      "Bash(docker:*)",
+      "Bash(wrangler:*)",
+      "Bash(ls:*)",
+      "Bash(wc:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(rm:*)",
+      "Bash(chmod:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(diff:*)",
+      "Bash(which:*)",
+      "Bash(echo:*)",
+      "Bash(jq:*)",
+      "Bash(bash:*)",
+      "Bash(systemctl:*)",
+      "Bash(python3:*)",
+      "Bash(pip:*)",
+      "Bash(sed:*)",
+      "Bash(awk:*)",
+      "Bash(sort:*)",
+      "Bash(uniq:*)",
+      "Bash(date:*)",
+      "Bash(touch:*)",
+      "Bash(tar:*)",
+      "Bash(zip:*)",
+      "Bash(unzip:*)",
+      "Read(*)",
+      "Edit(*)",
+      "Write(~/Projects/**)",
+      "Write(~/.claude/**)",
+      "Write(/tmp/**)",
+      "Glob(*)",
+      "Grep(*)",
+      "mcp__zoho__*",
+      "mcp__zohomcp__*"
+    ],
+    "deny": [
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Read(~/.gnupg/**)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(~/.claude/.credentials.json)",
+      "Read(~/.claude/.env.claude)",
+      "Write(*.env*)",
+      "Write(*credentials*)",
+      "Write(*secret*)",
+      "Write(*node_modules*)",
+      "Write(*.pem)",
+      "Write(*.key)",
+      "Write(~/.ssh/**)",
+      "Write(~/.aws/**)",
+      "Write(~/.gnupg/**)"
+    ]
+  },
+  "model": "opus[1m]",
+  "enabledMcpjsonServers": [
+    "zohomcp",
+    "firecrawl",
+    "sentry"
+  ],
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash(git commit:*)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/pre-commit.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash(git push:*)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/branch-guard.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash(rm:*)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/confirm-delete.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/block-env-edit.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash(vercel:*)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/pre-deploy-gate.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/migration-validate.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/auto-test.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/migration-validate.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/auto-test.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash(vercel --prod:*)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/post-deploy.sh"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/save-session-state.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/session-learn.sh"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/project-health-check.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/session-context-loader.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/context-budget-monitor.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/retention-cleanup.sh"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/pre-compact.sh"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/scripts/speak.sh \"$CLAUDE_NOTIFICATION_MESSAGE\""
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "node \"$HOME/.claude/hooks/gsd-statusline.js\""
+  },
+  "enabledPlugins": {
+    "typescript-lsp@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": true,
+    "firecrawl@claude-plugins-official": true,
+    "playwright@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "knowledge-work-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/knowledge-work-plugins"
+      }
+    }
+  },
+  "autoUpdatesChannel": "latest",
+  "skipDangerousModePermissionPrompt": true
+}

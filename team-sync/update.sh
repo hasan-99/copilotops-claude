@@ -6,8 +6,15 @@
 
 set -euo pipefail
 
-REPO_DIR="$HOME/.claude-config-repo"
 CLAUDE_DIR="$HOME/.claude"
+
+# Detect if we're running from inside the repo
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -f "$SCRIPT_DIR/../CLAUDE.md" ] && [ -d "$SCRIPT_DIR/../skills" ]; then
+    REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+else
+    REPO_DIR="$HOME/.claude-config-repo"
+fi
 
 echo ""
 echo "=================================================="
@@ -44,13 +51,15 @@ for dir in "${SHARED_DIRS[@]}"; do
 done
 echo ""
 
-# ---- Make hooks executable ----
+# ---- Make hooks and scripts executable ----
 chmod +x "$CLAUDE_DIR/hooks/"*.sh 2>/dev/null || true
 chmod +x "$CLAUDE_DIR/hooks/"*.js 2>/dev/null || true
+chmod +x "$CLAUDE_DIR/scripts/"*.sh 2>/dev/null || true
+chmod +x "$CLAUDE_DIR/scripts/"*.py 2>/dev/null || true
 
 # ---- Update shared files ----
 echo "-> Updating shared files..."
-SHARED_FILES=(CLAUDE.md qualia-context.md learned-patterns.md .clauderc .gitignore)
+SHARED_FILES=(CLAUDE.md .clauderc .gitignore .claudeignore)
 
 for file in "${SHARED_FILES[@]}"; do
     source="$REPO_DIR/$file"
