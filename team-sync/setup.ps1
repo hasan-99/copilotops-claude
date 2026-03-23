@@ -1,136 +1,182 @@
 # ============================================================
-# Qualia Solutions — Claude Code Config Setup (Windows)
-# Run once to install the shared team config
+# Qualia Solutions — Claude Code Setup (Windows)
+# Run: .\team-sync\setup.ps1
 # ============================================================
 
 $ErrorActionPreference = "Stop"
 
 $REPO_URL = "https://github.com/Qualiasolutions/qualia-claude.git"
-$REPO_DIR = "$env:USERPROFILE\.claude-config-repo"
 $CLAUDE_DIR = "$env:USERPROFILE\.claude"
 
+$ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+if (Test-Path "$ScriptDir\..\CLAUDE.md") { $REPO_DIR = (Resolve-Path "$ScriptDir\..").Path } else { $REPO_DIR = "$env:USERPROFILE\.claude-config-repo" }
+
 Write-Host ""
 Write-Host "==================================================" -ForegroundColor Cyan
-Write-Host "   Qualia Solutions - Claude Code Team Setup       " -ForegroundColor Cyan
+Write-Host "   Qualia Solutions - Claude Code Setup (Windows)  " -ForegroundColor Cyan
+Write-Host "   Intelligence Framework v2.0                     " -ForegroundColor Cyan
 Write-Host "==================================================" -ForegroundColor Cyan
 Write-Host ""
 
-# ---- Check prerequisites ----
+# ---- Who are you? ----
+Write-Host "Who are you?"
+Write-Host ""
+Write-Host "  1) Fawzi Goussous   - Founder (admin)"
+Write-Host "  2) Moayad Alqam     - Developer (manager)"
+Write-Host "  3) Hasan            - Developer (employee)"
+Write-Host "  4) Someone else     - New team member"
+Write-Host ""
+$choice = Read-Host "Enter number (1-4)"
+
+switch ($choice) {
+    "1" { $UserName = "Fawzi Goussous"; $UserRole = "owner"; $PortalEmail = "info@qualiasolutions.net"; $PortalRole = "admin" }
+    "2" { $UserName = "Moayad Alqam"; $UserRole = "employee"; $PortalEmail = "moayad@qualiasolutions.net"; $PortalRole = "manager" }
+    "3" { $UserName = "Hasan"; $UserRole = "employee"; $PortalEmail = "hasan@qualiasolutions.net"; $PortalRole = "employee" }
+    "4" {
+        $UserName = Read-Host "Enter your full name"
+        $PortalEmail = Read-Host "Enter your Qualia email"
+        $UserRole = "employee"
+        $PortalRole = "employee"
+    }
+    default { Write-Host "Invalid choice."; exit 1 }
+}
+
+Write-Host ""
+Write-Host "-> Setting up for $UserName ($PortalRole)" -ForegroundColor Yellow
+Write-Host ""
+
+# ---- Prerequisites ----
 Write-Host "-> Checking prerequisites..."
-
-if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
-    Write-Host "X Git is not installed. Install from https://git-scm.com/download/win" -ForegroundColor Red
-    exit 1
-}
-Write-Host "  OK git" -ForegroundColor Green
-
-if (-not (Get-Command claude -ErrorAction SilentlyContinue)) {
-    Write-Host "X Claude Code CLI not found. Install from https://docs.claude.com" -ForegroundColor Red
-    exit 1
-}
-Write-Host "  OK claude" -ForegroundColor Green
+if (Get-Command git -ErrorAction SilentlyContinue) { Write-Host "  OK git" -ForegroundColor Green } else { Write-Host "  X git not found" -ForegroundColor Red; exit 1 }
+if (Get-Command node -ErrorAction SilentlyContinue) { Write-Host "  OK node" -ForegroundColor Green } else { Write-Host "  WARN: node not found" -ForegroundColor Yellow }
+if (Get-Command claude -ErrorAction SilentlyContinue) { Write-Host "  OK claude" -ForegroundColor Green } else { Write-Host "  WARN: claude not found — npm i -g @anthropic-ai/claude-code" -ForegroundColor Yellow }
 Write-Host ""
 
-# ---- Backup existing config ----
-if (Test-Path $CLAUDE_DIR) {
-    $BACKUP = "$env:USERPROFILE\.claude-backup-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
-    Write-Host "-> Backing up existing config to $BACKUP..."
-    Copy-Item -Path $CLAUDE_DIR -Destination $BACKUP -Recurse
-    Write-Host "  OK Backup created" -ForegroundColor Green
+# ---- Backup ----
+if (Test-Path "$CLAUDE_DIR\settings.json") {
+    $backup = "$env:USERPROFILE\.claude-backup-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
+    Write-Host "-> Backing up to $backup..."
+    Copy-Item -Recurse $CLAUDE_DIR $backup
+    Write-Host "  OK" -ForegroundColor Green
     Write-Host ""
 }
 
-# ---- Clone repo ----
-if (Test-Path $REPO_DIR) {
-    Write-Host "-> Updating existing repo..."
-    Push-Location $REPO_DIR
-    git pull origin main
-    Pop-Location
-} else {
-    Write-Host "-> Cloning shared config..."
-    git clone $REPO_URL $REPO_DIR
-}
-Write-Host "  OK Repo ready" -ForegroundColor Green
-Write-Host ""
-
-# ---- Create .claude directory if needed ----
-if (-not (Test-Path $CLAUDE_DIR)) {
-    New-Item -ItemType Directory -Path $CLAUDE_DIR -Force | Out-Null
+# ---- Clone/update repo ----
+if ($REPO_DIR -eq "$env:USERPROFILE\.claude-config-repo") {
+    if (Test-Path $REPO_DIR) {
+        Push-Location $REPO_DIR; git pull origin main 2>$null; Pop-Location
+    } else {
+        git clone $REPO_URL $REPO_DIR
+    }
+    Write-Host "-> Repo ready" -ForegroundColor Green
+    Write-Host ""
 }
 
-# ---- Copy shared directories ----
-Write-Host "-> Syncing shared directories..."
-$SHARED_DIRS = @("rules", "skills", "commands", "agents", "hooks", "get-shit-done", "knowledge", "scripts")
+# ---- Install framework ----
+New-Item -ItemType Directory -Force -Path $CLAUDE_DIR | Out-Null
+New-Item -ItemType Directory -Force -Path "$CLAUDE_DIR\agent-memory" | Out-Null
 
-foreach ($dir in $SHARED_DIRS) {
-    $source = Join-Path $REPO_DIR $dir
+Write-Host "-> Installing intelligence framework..."
+$dirs = @("rules", "skills", "commands", "agents", "hooks", "get-shit-done", "knowledge", "scripts", "config")
+foreach ($dir in $dirs) {
+    $src = Join-Path $REPO_DIR $dir
     $dest = Join-Path $CLAUDE_DIR $dir
-
-    if (Test-Path $source) {
-        # Remove existing directory and replace with repo version
-        if (Test-Path $dest) {
-            Remove-Item -Path $dest -Recurse -Force
-        }
-        Copy-Item -Path $source -Destination $dest -Recurse
+    if (Test-Path $src) {
+        if (Test-Path $dest) { Remove-Item -Recurse -Force $dest }
+        Copy-Item -Recurse $src $dest
         Write-Host "  OK $dir" -ForegroundColor Green
     }
 }
 Write-Host ""
 
-# ---- Copy shared files ----
-Write-Host "-> Syncing shared files..."
-$SHARED_FILES = @("CLAUDE.md", ".clauderc", ".gitignore")
-
-foreach ($file in $SHARED_FILES) {
-    $source = Join-Path $REPO_DIR $file
-    $dest = Join-Path $CLAUDE_DIR $file
-
-    if (Test-Path $source) {
-        Copy-Item -Path $source -Destination $dest -Force
-        Write-Host "  OK $file" -ForegroundColor Green
-    }
+# ---- Role-based CLAUDE.md ----
+Write-Host "-> Installing $PortalRole profile..."
+$roleFile = Join-Path $REPO_DIR "team-sync\roles\$UserRole.md"
+if (Test-Path $roleFile) {
+    $content = Get-Content $roleFile -Raw
+    $content = $content -replace '\{\{EMPLOYEE_NAME\}\}', $UserName
+    $content = $content -replace '\{\{PORTAL_EMAIL\}\}', $PortalEmail
+    $content = $content -replace '\{\{PORTAL_ROLE\}\}', $PortalRole
+    $content = $content -replace '\{\{PORTAL_ROLE_UPPER\}\}', $PortalRole.ToUpper()
+    $content | Set-Content (Join-Path $CLAUDE_DIR "CLAUDE.md") -Encoding UTF8
+    Write-Host "  OK CLAUDE.md ($UserRole)" -ForegroundColor Green
+} else {
+    Copy-Item (Join-Path $REPO_DIR "CLAUDE.md") (Join-Path $CLAUDE_DIR "CLAUDE.md")
+    Write-Host "  OK CLAUDE.md (default)" -ForegroundColor Green
 }
 Write-Host ""
 
-# ---- Create settings.json from template if it doesn't exist ----
-$SETTINGS_FILE = Join-Path $CLAUDE_DIR "settings.json"
-$SETTINGS_TEMPLATE = Join-Path $REPO_DIR "team-sync\settings.json.template"
+# ---- MEMORY.md ----
+$memoryDir = Join-Path $CLAUDE_DIR "projects\-home-$env:USERNAME--claude\memory"
+New-Item -ItemType Directory -Force -Path $memoryDir | Out-Null
+$memoryTemplate = Join-Path $REPO_DIR "team-sync\MEMORY.md.template"
+if ((-not (Test-Path (Join-Path $memoryDir "MEMORY.md"))) -and (Test-Path $memoryTemplate)) {
+    Copy-Item $memoryTemplate (Join-Path $memoryDir "MEMORY.md")
+    Write-Host "-> MEMORY.md installed" -ForegroundColor Green
+} else {
+    Write-Host "-> MEMORY.md exists (keeping yours)" -ForegroundColor Green
+}
 
-if (-not (Test-Path $SETTINGS_FILE)) {
-    if (Test-Path $SETTINGS_TEMPLATE) {
-        Copy-Item -Path $SETTINGS_TEMPLATE -Destination $SETTINGS_FILE
-        Write-Host "-> Created settings.json from template" -ForegroundColor Yellow
-        Write-Host "   IMPORTANT: Open $SETTINGS_FILE and fill in your API keys!" -ForegroundColor Yellow
+# ---- Settings.json ----
+$settingsFile = Join-Path $CLAUDE_DIR "settings.json"
+if (-not (Test-Path $settingsFile)) {
+    $template = Join-Path $REPO_DIR "team-sync\settings.json.template"
+    if (Test-Path $template) {
+        Copy-Item $template $settingsFile
+        Write-Host "-> settings.json created — FILL IN YOUR API KEYS" -ForegroundColor Yellow
     }
 } else {
-    Write-Host "-> settings.json already exists (keeping your keys)" -ForegroundColor Green
+    Write-Host "-> settings.json exists (keeping yours)" -ForegroundColor Green
 }
 
-# ---- Create .mcp.json from template if it doesn't exist ----
-$MCP_FILE = Join-Path $CLAUDE_DIR ".mcp.json"
-$MCP_TEMPLATE = Join-Path $REPO_DIR "team-sync\mcp.json.template"
+# ---- MCP Servers ----
+Write-Host ""
+Write-Host "-> Configuring MCP servers..."
+$localSettings = Join-Path $CLAUDE_DIR "settings.local.json"
 
-if (-not (Test-Path $MCP_FILE)) {
-    if (Test-Path $MCP_TEMPLATE) {
-        Copy-Item -Path $MCP_TEMPLATE -Destination $MCP_FILE
-        Write-Host "-> Created .mcp.json from template" -ForegroundColor Yellow
-        Write-Host "   IMPORTANT: Open $MCP_FILE and fill in your server URLs!" -ForegroundColor Yellow
+$mcpConfig = @{
+    mcpServers = @{
+        context7 = @{ command = "npx"; args = @("-y", "@context7/mcp-server") }
+        playwright = @{ command = "npx"; args = @("-y", "@playwright/mcp@latest") }
     }
-} else {
-    Write-Host "-> .mcp.json already exists (keeping your config)" -ForegroundColor Green
+}
+Write-Host "  OK context7 (docs lookup)" -ForegroundColor Green
+Write-Host "  OK playwright (browser)" -ForegroundColor Green
+
+$hasSupabase = Read-Host "  Supabase access token? (y/n)"
+if ($hasSupabase -eq "y") {
+    $token = Read-Host "  SUPABASE_ACCESS_TOKEN"
+    $mcpConfig.mcpServers["supabase"] = @{
+        command = "npx"
+        args = @("-y", "@anthropic/supabase-mcp-server")
+        env = @{ SUPABASE_ACCESS_TOKEN = $token }
+    }
+    Write-Host "  OK supabase" -ForegroundColor Green
 }
 
+$mcpConfig | ConvertTo-Json -Depth 10 | Set-Content $localSettings -Encoding UTF8
+Write-Host "  OK settings.local.json" -ForegroundColor Green
 Write-Host ""
+
+# ---- Summary ----
+$skillCount = (Get-ChildItem (Join-Path $CLAUDE_DIR "skills") -Directory -ErrorAction SilentlyContinue).Count
+$agentCount = (Get-ChildItem (Join-Path $CLAUDE_DIR "agents") -File -ErrorAction SilentlyContinue).Count
+
 Write-Host "==================================================" -ForegroundColor Green
-Write-Host "   Setup complete!                                 " -ForegroundColor Green
+Write-Host "   Setup complete: $UserName ($PortalRole)" -ForegroundColor Green
 Write-Host "==================================================" -ForegroundColor Green
 Write-Host ""
-Write-Host "Next steps:" -ForegroundColor Yellow
-Write-Host "  1. Open $SETTINGS_FILE" -ForegroundColor White
-Write-Host "     Replace all YOUR_*_HERE placeholders with your real API keys" -ForegroundColor White
+Write-Host "Installed: $skillCount skills, $agentCount agents"
+Write-Host "Role: $PortalRole (portal: $PortalEmail)"
 Write-Host ""
-Write-Host "  2. Open $MCP_FILE" -ForegroundColor White
-Write-Host "     Fill in your MCP server URLs" -ForegroundColor White
+
+if ($UserRole -eq "owner") {
+    Write-Host "OWNER: Full authority."
+} else {
+    Write-Host "STAFF: Full tools. Claude guides on when to check with Fawzi."
+    Write-Host ""
+    Write-Host "Start: https://portal.qualiasolutions.net/framework"
+}
 Write-Host ""
-Write-Host "  3. Run 'claude' to verify everything works" -ForegroundColor White
+Write-Host "Run 'claude' to start working."
 Write-Host ""

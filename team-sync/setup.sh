@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # ============================================================
-# Qualia Solutions — Claude Code Config Setup (Mac/Linux)
+# Qualia Solutions — Claude Code Setup (Mac/Linux)
 # Installs the full Qualia intelligence framework.
-# Re-run anytime to sync latest updates from the team repo.
+# Re-run anytime to sync latest updates.
 # ============================================================
 
 set -euo pipefail
@@ -10,7 +10,6 @@ set -euo pipefail
 REPO_URL="https://github.com/Qualiasolutions/qualia-claude.git"
 CLAUDE_DIR="$HOME/.claude"
 
-# Detect if we're running from inside the repo already
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if [ -f "$SCRIPT_DIR/../CLAUDE.md" ] && [ -d "$SCRIPT_DIR/../skills" ]; then
     REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -21,213 +20,253 @@ fi
 echo ""
 echo "=================================================="
 echo "   Qualia Solutions — Claude Code Setup            "
-echo "   Full Intelligence Framework v2.0                "
+echo "   Intelligence Framework v2.0                     "
 echo "=================================================="
 echo ""
 
 # ---- Who are you? ----
 echo "Who are you?"
 echo ""
-echo "  1) Fawzi   (founder)"
-echo "  2) Moayad  (developer)"
-echo "  3) Hasan   (developer)"
+echo "  1) Fawzi Goussous   — Founder (admin)"
+echo "  2) Moayad Alqam     — Developer (manager)"
+echo "  3) Hasan            — Developer (employee)"
+echo "  4) Someone else     — New team member"
 echo ""
-read -p "Enter number (1-3): " USER_CHOICE
+read -p "Enter number (1-4): " USER_CHOICE
 
 case "$USER_CHOICE" in
     1)
-        USER_NAME="Fawzi"
+        USER_NAME="Fawzi Goussous"
         USER_ROLE="owner"
+        PORTAL_EMAIL="info@qualiasolutions.net"
+        PORTAL_ROLE="admin"
         ;;
     2)
-        USER_NAME="Moayad"
+        USER_NAME="Moayad Alqam"
         USER_ROLE="employee"
+        PORTAL_EMAIL="moayad@qualiasolutions.net"
+        PORTAL_ROLE="manager"
         ;;
     3)
         USER_NAME="Hasan"
         USER_ROLE="employee"
+        PORTAL_EMAIL="hasan@qualiasolutions.net"
+        PORTAL_ROLE="employee"
+        ;;
+    4)
+        read -p "Enter your full name: " USER_NAME
+        read -p "Enter your Qualia email: " PORTAL_EMAIL
+        USER_ROLE="employee"
+        PORTAL_ROLE="employee"
         ;;
     *)
-        echo "Invalid choice. Defaulting to employee."
-        read -p "Enter your name: " USER_NAME
-        USER_ROLE="employee"
+        echo "Invalid choice."
+        exit 1
         ;;
 esac
 
+PORTAL_ROLE_UPPER=$(echo "$PORTAL_ROLE" | tr '[:lower:]' '[:upper:]')
+
 echo ""
-echo "-> Setting up for $USER_NAME ($USER_ROLE)"
+echo "-> Setting up for $USER_NAME"
+echo "   Portal: $PORTAL_EMAIL ($PORTAL_ROLE)"
 echo ""
 
-# ---- Check prerequisites ----
+# ---- Prerequisites ----
 echo "-> Checking prerequisites..."
-
-if ! command -v git &>/dev/null; then
-    echo "  X Git is not installed."
-    exit 1
-fi
-echo "  OK git"
-
-if ! command -v claude &>/dev/null; then
-    echo "  WARN: Claude Code CLI not found. Install: npm i -g @anthropic-ai/claude-code"
-else
-    echo "  OK claude"
-fi
+command -v git &>/dev/null && echo "  OK git" || { echo "  X git not found"; exit 1; }
+command -v node &>/dev/null && echo "  OK node ($(node -v))" || echo "  WARN: node not found"
+command -v claude &>/dev/null && echo "  OK claude" || echo "  WARN: claude not found — install: npm i -g @anthropic-ai/claude-code"
 echo ""
 
-# ---- Backup existing config ----
+# ---- Backup ----
 if [ -d "$CLAUDE_DIR" ] && [ -f "$CLAUDE_DIR/settings.json" ]; then
     BACKUP="$HOME/.claude-backup-$(date +%Y%m%d-%H%M%S)"
-    echo "-> Backing up existing config to $BACKUP..."
+    echo "-> Backing up to $BACKUP..."
     cp -r "$CLAUDE_DIR" "$BACKUP"
-    echo "  OK Backup created"
+    echo "  OK"
     echo ""
 fi
 
-# ---- Clone or update repo ----
+# ---- Clone/update repo ----
 if [ "$REPO_DIR" = "$HOME/.claude-config-repo" ]; then
     if [ -d "$REPO_DIR" ]; then
-        echo "-> Updating repo..."
         git -C "$REPO_DIR" pull origin main 2>/dev/null || true
     else
-        echo "-> Cloning shared config..."
         git clone "$REPO_URL" "$REPO_DIR"
     fi
-    echo "  OK Repo ready"
+    echo "-> Repo ready"
     echo ""
 fi
 
-# ---- Create directory structure ----
-mkdir -p "$CLAUDE_DIR"
-mkdir -p "$CLAUDE_DIR/agent-memory"
+# ---- Install framework ----
+mkdir -p "$CLAUDE_DIR" "$CLAUDE_DIR/agent-memory"
 
-# ---- Copy shared directories (FULL intelligence — same for everyone) ----
-echo "-> Installing Qualia intelligence framework..."
-SHARED_DIRS=(rules skills commands agents hooks get-shit-done knowledge scripts config)
-
-for dir in "${SHARED_DIRS[@]}"; do
+echo "-> Installing intelligence framework..."
+for dir in rules skills commands agents hooks get-shit-done knowledge scripts config; do
     src="$REPO_DIR/$dir"
     dest="$CLAUDE_DIR/$dir"
-
     if [ -d "$src" ]; then
         rm -rf "$dest"
         cp -r "$src" "$dest"
-        count=$(find "$dest" -type f | wc -l)
-        echo "  OK $dir ($count files)"
+        echo "  OK $dir"
     fi
 done
 echo ""
 
-# ---- Set executable permissions ----
+# ---- Permissions ----
 chmod +x "$CLAUDE_DIR/hooks/"*.sh 2>/dev/null || true
 chmod +x "$CLAUDE_DIR/hooks/"*.js 2>/dev/null || true
 chmod +x "$CLAUDE_DIR/scripts/"*.sh 2>/dev/null || true
-chmod +x "$CLAUDE_DIR/scripts/"*.py 2>/dev/null || true
 
-# ---- Install role-based CLAUDE.md ----
-echo "-> Setting up $USER_ROLE profile for $USER_NAME..."
-
+# ---- Role-based CLAUDE.md ----
+echo "-> Installing $PORTAL_ROLE profile..."
 ROLE_FILE="$REPO_DIR/team-sync/roles/$USER_ROLE.md"
 if [ -f "$ROLE_FILE" ]; then
-    # Replace {{EMPLOYEE_NAME}} placeholder with actual name
-    sed "s/{{EMPLOYEE_NAME}}/$USER_NAME/g" "$ROLE_FILE" > "$CLAUDE_DIR/CLAUDE.md"
-    echo "  OK CLAUDE.md installed ($USER_ROLE profile)"
+    sed -e "s/{{EMPLOYEE_NAME}}/$USER_NAME/g" \
+        -e "s/{{PORTAL_EMAIL}}/$PORTAL_EMAIL/g" \
+        -e "s/{{PORTAL_ROLE}}/$PORTAL_ROLE/g" \
+        -e "s/{{PORTAL_ROLE_UPPER}}/$PORTAL_ROLE_UPPER/g" \
+        "$ROLE_FILE" > "$CLAUDE_DIR/CLAUDE.md"
+    echo "  OK CLAUDE.md ($USER_ROLE)"
 else
-    # Fallback to default CLAUDE.md
     cp "$REPO_DIR/CLAUDE.md" "$CLAUDE_DIR/CLAUDE.md"
-    echo "  OK CLAUDE.md installed (default)"
+    echo "  OK CLAUDE.md (default)"
 fi
 echo ""
 
-# ---- Setup MEMORY.md ----
-echo "-> Setting up memory system..."
-MEMORY_TEMPLATE="$REPO_DIR/team-sync/MEMORY.md.template"
+# ---- MEMORY.md ----
 MEMORY_DIR="$CLAUDE_DIR/projects/-home-$(whoami)--claude/memory"
 mkdir -p "$MEMORY_DIR"
-
+MEMORY_TEMPLATE="$REPO_DIR/team-sync/MEMORY.md.template"
 if [ ! -f "$MEMORY_DIR/MEMORY.md" ] && [ -f "$MEMORY_TEMPLATE" ]; then
     cp "$MEMORY_TEMPLATE" "$MEMORY_DIR/MEMORY.md"
-    echo "  OK MEMORY.md installed (auto-loaded every session)"
-elif [ -f "$MEMORY_DIR/MEMORY.md" ]; then
-    echo "  OK MEMORY.md already exists (keeping yours)"
+    echo "-> MEMORY.md installed"
+else
+    echo "-> MEMORY.md exists (keeping yours)"
 fi
-echo ""
 
 # ---- Settings.json ----
-SETTINGS_FILE="$CLAUDE_DIR/settings.json"
-SETTINGS_TEMPLATE="$REPO_DIR/team-sync/settings.json.template"
-
-if [ ! -f "$SETTINGS_FILE" ]; then
-    if [ -f "$SETTINGS_TEMPLATE" ]; then
-        cp "$SETTINGS_TEMPLATE" "$SETTINGS_FILE"
-        echo "-> Created settings.json from template"
-        echo "   IMPORTANT: Fill in your API keys in $SETTINGS_FILE"
-    fi
+if [ ! -f "$CLAUDE_DIR/settings.json" ]; then
+    cp "$REPO_DIR/team-sync/settings.json.template" "$CLAUDE_DIR/settings.json" 2>/dev/null || true
+    echo "-> settings.json created — FILL IN YOUR API KEYS"
 else
-    echo "-> settings.json already exists (keeping your keys)"
+    echo "-> settings.json exists (keeping yours)"
 fi
 
-# ---- MCP config ----
-MCP_FILE="$HOME/.mcp.json"
-MCP_TEMPLATE="$REPO_DIR/team-sync/mcp.json.template"
+# ---- MCP Servers ----
+echo ""
+echo "-> Configuring MCP servers..."
+MCP_FILE="$CLAUDE_DIR/settings.local.json"
 
-if [ ! -f "$MCP_FILE" ]; then
-    if [ -f "$MCP_TEMPLATE" ]; then
-        cp "$MCP_TEMPLATE" "$MCP_FILE"
-        echo "-> Created ~/.mcp.json from template"
-    fi
-else
-    echo "-> ~/.mcp.json already exists (keeping yours)"
+# Build MCP config based on what user needs
+# These are the core MCP servers everyone should have
+cat > /tmp/qualia-mcp-config.json << 'MCPEOF'
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@context7/mcp-server"]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"]
+    }
+  }
+}
+MCPEOF
+
+echo "  OK context7 (documentation lookup)"
+echo "  OK playwright (browser automation)"
+
+# Supabase MCP — needs access token
+echo ""
+read -p "  Do you have a Supabase access token? (y/n): " HAS_SUPABASE
+if [ "$HAS_SUPABASE" = "y" ] || [ "$HAS_SUPABASE" = "Y" ]; then
+    read -p "  Enter SUPABASE_ACCESS_TOKEN: " SUPABASE_TOKEN
+    python3 -c "
+import json
+with open('/tmp/qualia-mcp-config.json') as f:
+    d = json.load(f)
+d['mcpServers']['supabase'] = {
+    'command': 'npx',
+    'args': ['-y', '@anthropic/supabase-mcp-server'],
+    'env': {'SUPABASE_ACCESS_TOKEN': '$SUPABASE_TOKEN'}
+}
+with open('/tmp/qualia-mcp-config.json', 'w') as f:
+    json.dump(d, f, indent=2)
+" 2>/dev/null
+    echo "  OK supabase MCP"
 fi
+
+# Firecrawl — needs API key
+echo ""
+read -p "  Do you have a Firecrawl API key? (y/n): " HAS_FIRECRAWL
+if [ "$HAS_FIRECRAWL" = "y" ] || [ "$HAS_FIRECRAWL" = "Y" ]; then
+    read -p "  Enter FIRECRAWL_API_KEY: " FIRECRAWL_KEY
+    python3 -c "
+import json
+with open('/tmp/qualia-mcp-config.json') as f:
+    d = json.load(f)
+d.setdefault('env', {})['FIRECRAWL_API_KEY'] = '$FIRECRAWL_KEY'
+with open('/tmp/qualia-mcp-config.json', 'w') as f:
+    json.dump(d, f, indent=2)
+" 2>/dev/null
+    echo "  OK firecrawl"
+fi
+
+# Merge MCP config into settings.local.json (won't overwrite settings.json)
+if [ -f "$MCP_FILE" ]; then
+    # Merge MCP servers into existing settings.local.json
+    python3 -c "
+import json
+with open('$MCP_FILE') as f:
+    existing = json.load(f)
+with open('/tmp/qualia-mcp-config.json') as f:
+    new_mcp = json.load(f)
+existing.setdefault('mcpServers', {}).update(new_mcp.get('mcpServers', {}))
+if 'env' in new_mcp:
+    existing.setdefault('env', {}).update(new_mcp['env'])
+with open('$MCP_FILE', 'w') as f:
+    json.dump(existing, f, indent=2)
+" 2>/dev/null
+    echo "  OK merged into settings.local.json"
+else
+    cp /tmp/qualia-mcp-config.json "$MCP_FILE"
+    echo "  OK created settings.local.json"
+fi
+rm -f /tmp/qualia-mcp-config.json
 echo ""
 
 # ---- Summary ----
 SKILL_COUNT=$(ls "$CLAUDE_DIR/skills/" 2>/dev/null | wc -l)
 AGENT_COUNT=$(ls "$CLAUDE_DIR/agents/" 2>/dev/null | wc -l)
-HOOK_COUNT=$(ls "$CLAUDE_DIR/hooks/" 2>/dev/null | wc -l)
+HOOK_COUNT=$(find "$CLAUDE_DIR/hooks/" -name "*.sh" -o -name "*.js" 2>/dev/null | wc -l)
 KNOWLEDGE_COUNT=$(find "$CLAUDE_DIR/knowledge/" -type f 2>/dev/null | wc -l)
-WORKFLOW_COUNT=$(ls "$CLAUDE_DIR/get-shit-done/workflows/" 2>/dev/null | wc -l)
 
 echo "=================================================="
-echo "   Setup complete for $USER_NAME ($USER_ROLE)      "
+echo "   Setup complete: $USER_NAME ($PORTAL_ROLE)"
 echo "=================================================="
 echo ""
 echo "Installed:"
-echo "  $SKILL_COUNT skills          (auto-invoked capabilities)"
-echo "  $AGENT_COUNT agents          (specialized AI subagents)"
-echo "  $HOOK_COUNT hooks           (automated enforcement)"
-echo "  $KNOWLEDGE_COUNT knowledge files  (project intelligence)"
-echo "  $WORKFLOW_COUNT GSD workflows    (project lifecycle)"
-echo "  MEMORY.md         (auto-loaded routing index)"
+echo "  $SKILL_COUNT skills · $AGENT_COUNT agents · $HOOK_COUNT hooks · $KNOWLEDGE_COUNT knowledge files"
+echo "  Role: $PORTAL_ROLE (portal: $PORTAL_EMAIL)"
 echo ""
 
 if [ "$USER_ROLE" = "owner" ]; then
-    echo "As OWNER, you have full authority over all projects."
-    echo ""
-    echo "Key commands:"
-    echo "  /qualia:quick     — Fast task execution"
-    echo "  /ship             — Deploy to production"
-    echo "  /review           — Code review"
-    echo "  /team             — Orchestrate agent teams"
-    echo "  /qualia:help      — All commands"
-    echo ""
+    echo "OWNER: Full authority. All commands available."
 else
-    echo "As EMPLOYEE, you have the same tools as Fawzi."
-    echo "Claude will guide you on when to check with him"
-    echo "(deployments, architecture, client-facing changes)."
-    echo ""
-    echo "Key commands:"
-    echo "  /qualia:quick     — Do a task fast (most used)"
-    echo "  /ship             — Deploy (check with Fawzi first)"
-    echo "  /review           — Code review before shipping"
-    echo "  /debug            — Fix something broken"
-    echo "  /qualia:help      — See all commands"
+    echo "STAFF: Full tools — Claude guides you on when to check with Fawzi."
     echo ""
     echo "Start here:"
     echo "  1. Read: ~/Projects/live/qualia/docs/trainee-onboarding.md"
     echo "  2. Visit: https://portal.qualiasolutions.net/framework"
-    echo "  3. Check portal for your assigned tasks"
-    echo ""
+    echo "  3. Check portal for your tasks: https://portal.qualiasolutions.net"
 fi
-
-echo "Run 'claude' to start working."
+echo ""
+echo "Commands:"
+echo "  /qualia:quick — Fast task    /ship — Deploy    /review — Audit"
+echo "  /debug — Fix bugs            /qualia:help — All commands"
+echo ""
+echo "Run 'claude' to start."
 echo ""
