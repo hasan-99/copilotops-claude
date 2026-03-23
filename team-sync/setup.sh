@@ -3,6 +3,7 @@
 # Qualia Solutions — Claude Code Config Setup (Mac/Linux)
 # Run once to install the shared team config.
 # Can be run standalone (clones repo) or from an existing clone.
+# Re-run anytime to sync latest intelligence updates.
 # ============================================================
 
 set -euo pipefail
@@ -21,6 +22,7 @@ fi
 echo ""
 echo "=================================================="
 echo "   Qualia Solutions - Claude Code Team Setup       "
+echo "   v2.0 — Intelligence Framework Edition           "
 echo "=================================================="
 echo ""
 
@@ -37,7 +39,7 @@ if ! command -v claude &>/dev/null; then
     echo "  WARN: Claude Code CLI not found. Install: npm i -g @anthropic-ai/claude-code"
     echo "        Continuing setup anyway..."
 else
-    echo "  OK claude"
+    echo "  OK claude ($(claude --version 2>/dev/null || echo 'unknown version'))"
 fi
 echo ""
 
@@ -63,12 +65,13 @@ if [ "$REPO_DIR" = "$HOME/.claude-config-repo" ]; then
     echo ""
 fi
 
-# ---- Create .claude directory if needed ----
+# ---- Create .claude directory structure ----
 mkdir -p "$CLAUDE_DIR"
+mkdir -p "$CLAUDE_DIR/agent-memory"
 
 # ---- Copy shared directories ----
 echo "-> Syncing shared directories..."
-SHARED_DIRS=(rules skills commands agents hooks get-shit-done knowledge scripts)
+SHARED_DIRS=(rules skills commands agents hooks get-shit-done knowledge scripts config)
 
 for dir in "${SHARED_DIRS[@]}"; do
     src="$REPO_DIR/$dir"
@@ -77,7 +80,8 @@ for dir in "${SHARED_DIRS[@]}"; do
     if [ -d "$src" ]; then
         rm -rf "$dest"
         cp -r "$src" "$dest"
-        echo "  OK $dir"
+        count=$(find "$dest" -type f | wc -l)
+        echo "  OK $dir ($count files)"
     fi
 done
 echo ""
@@ -112,6 +116,22 @@ for file in "${SHARED_FILES[@]}"; do
 done
 echo ""
 
+# ---- Setup MEMORY.md (auto-loaded intelligence router) ----
+echo "-> Setting up memory system..."
+MEMORY_TEMPLATE="$REPO_DIR/team-sync/MEMORY.md.template"
+# Each user's memory dir is project-path-based
+# Create a default memory location
+DEFAULT_MEMORY_DIR="$CLAUDE_DIR/projects/-home-$(whoami)--claude/memory"
+mkdir -p "$DEFAULT_MEMORY_DIR"
+
+if [ ! -f "$DEFAULT_MEMORY_DIR/MEMORY.md" ] && [ -f "$MEMORY_TEMPLATE" ]; then
+    cp "$MEMORY_TEMPLATE" "$DEFAULT_MEMORY_DIR/MEMORY.md"
+    echo "  OK MEMORY.md installed (auto-loaded every session)"
+elif [ -f "$DEFAULT_MEMORY_DIR/MEMORY.md" ]; then
+    echo "  OK MEMORY.md already exists (keeping your version)"
+fi
+echo ""
+
 # ---- Create settings.json from template if it doesn't exist ----
 SETTINGS_FILE="$CLAUDE_DIR/settings.json"
 SETTINGS_TEMPLATE="$REPO_DIR/team-sync/settings.json.template"
@@ -124,10 +144,10 @@ if [ ! -f "$SETTINGS_FILE" ]; then
     fi
 else
     echo "-> settings.json already exists (keeping your keys)"
+    echo "   To get new hooks/features, merge from: $SETTINGS_TEMPLATE"
 fi
 
 # ---- Create ~/.mcp.json from template if it doesn't exist ----
-# Note: MCP config lives at ~/.mcp.json (home root), NOT inside ~/.claude/
 MCP_FILE="$HOME/.mcp.json"
 MCP_TEMPLATE="$REPO_DIR/team-sync/mcp.json.template"
 
@@ -135,27 +155,41 @@ if [ ! -f "$MCP_FILE" ]; then
     if [ -f "$MCP_TEMPLATE" ]; then
         cp "$MCP_TEMPLATE" "$MCP_FILE"
         echo "-> Created ~/.mcp.json from template"
-        echo "   MCP keys are read from settings.json env vars automatically."
     fi
 else
     echo "-> ~/.mcp.json already exists (keeping your config)"
 fi
-
-# ---- Create config directory with retention.json ----
-if [ -d "$REPO_DIR/config" ]; then
-    mkdir -p "$CLAUDE_DIR/config"
-    cp -r "$REPO_DIR/config/"* "$CLAUDE_DIR/config/" 2>/dev/null || true
-    echo "  OK config"
-fi
-
 echo ""
+
+# ---- Summary ----
 echo "=================================================="
 echo "   Setup complete!                                 "
 echo "=================================================="
 echo ""
+echo "What was installed:"
+echo "  - $(ls "$CLAUDE_DIR/skills/" | wc -l) skills (auto-invoked capabilities)"
+echo "  - $(ls "$CLAUDE_DIR/agents/" | wc -l) agents (specialized subagents)"
+echo "  - $(ls "$CLAUDE_DIR/hooks/" | wc -l) hooks (automated enforcement)"
+echo "  - $(ls "$CLAUDE_DIR/knowledge/" | wc -l) knowledge files (project intelligence)"
+echo "  - $(ls "$CLAUDE_DIR/get-shit-done/workflows/" | wc -l) GSD workflows"
+echo "  - $(ls "$CLAUDE_DIR/rules/" | wc -l) rule files (always-loaded)"
+echo "  - MEMORY.md (auto-loaded routing index)"
+echo ""
 echo "Next steps:"
-echo "  1. Open $SETTINGS_FILE"
+echo "  1. If first time: Open $SETTINGS_FILE"
 echo "     Replace all YOUR_*_HERE placeholders with your real API keys"
 echo ""
-echo "  2. Run 'claude' to verify everything works"
+echo "  2. Run 'claude' to start working"
+echo ""
+echo "  3. Key commands for trainees:"
+echo "     /qualia:quick     — Fast task execution (most used)"
+echo "     /ship             — Deploy to production"
+echo "     /review           — Code review before shipping"
+echo "     /qualia:help      — See all available commands"
+echo ""
+echo "  4. Read the onboarding guide:"
+echo "     ~/Projects/live/qualia/docs/trainee-onboarding.md"
+echo ""
+echo "  5. Interactive framework docs:"
+echo "     https://portal.qualiasolutions.net/framework"
 echo ""
