@@ -24,14 +24,33 @@ Reference: `~/.claude/get-shit-done/workflows/complete-milestone.md`
 Verify the most recent `v*-MILESTONE-AUDIT.md` shows PASS. If not:
 > "Milestone audit hasn't passed yet. Run `/qualia-audit-milestone` first."
 
-### 2. Verify Readiness
+### 2. Shipping Checklist Final Gate
+
+Before archiving, run the full shipping checklist from `~/Projects/live/qualia/docs/completion-checklists.md`.
+
+Detect project type from `.planning/PROJECT.md` and load the matching checklist:
+- **website** → "Website-Specific Checklist" + "Universal Checklist"
+- **agent** → "AI Agent Checklist" + "Universal Checklist"
+- **voice** → "Voice Agent Checklist" + "Universal Checklist"
+- **mobile** → "Mobile App Checklist" + "Universal Checklist"
+- **platform** → "Platform with LLM Checklist" + "Universal Checklist"
+
+Run automated checks for every item possible (grep, file existence, build checks). Report:
+- PASS / WARN / FAIL per item
+- Total: "Shipping checklist: X/Y items verified"
+
+Any FAIL items block milestone completion. Ask user: "Fix these first, or accept risk and continue?"
+Include checklist results in the milestone archive.
+
+### 3. Verify Readiness
 
 Confirm with user:
 - All phases complete and verified
+- Shipping checklist passed (or risks accepted)
 - No critical tech debt blocking release
 - Ready to archive and tag
 
-### 3. Gather Stats
+### 4. Gather Stats
 
 Collect from STATE.md and git history:
 - Total phases completed

@@ -209,6 +209,19 @@ Severity-scored findings with exact `file:line` references and fix recommendatio
 
 ---
 
+## Shipping Checklist Scan
+
+After running all review agents, cross-reference findings against the relevant shipping checklist from `~/Projects/live/qualia/docs/completion-checklists.md`.
+
+Detect project type and load the matching checklist:
+- **website** → "Website-Specific Checklist" + "Universal Checklist"
+- **agent/ai** → "AI Agent Checklist" + "Universal Checklist"
+- **voice** → "Voice Agent Checklist" + "Universal Checklist"
+- **mobile** → "Mobile App Checklist" + "Universal Checklist"
+- **platform** → "Platform with LLM Checklist" + "Universal Checklist"
+
+For each checklist item, run automated verification where possible (grep, file checks, build checks). Include a "Shipping Checklist" section in the review report with PASS/WARN/FAIL per item. FAIL items should be scored as HIGH severity findings.
+
 ## Persist Results
 
 After generating the review report, write findings to a persistent file:

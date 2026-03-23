@@ -32,11 +32,17 @@ def speak(text: str):
             f.write(chunk)
         f.flush()
 
-        # Play with mpv (quiet mode) or paplay
-        try:
-            subprocess.run(["mpv", "--no-video", "--really-quiet", f.name], check=True)
-        except FileNotFoundError:
-            subprocess.run(["ffplay", "-nodisp", "-autoexit", "-loglevel", "quiet", f.name], check=True)
+        # Play with mpv, ffplay, or paplay
+        for cmd in [
+            ["mpv", "--no-video", "--really-quiet", f.name],
+            ["ffplay", "-nodisp", "-autoexit", "-loglevel", "quiet", f.name],
+            ["paplay", f.name],
+        ]:
+            try:
+                subprocess.run(cmd, check=True)
+                break
+            except FileNotFoundError:
+                continue
 
         os.unlink(f.name)
 

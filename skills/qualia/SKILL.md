@@ -2,7 +2,6 @@
 name: qualia
 description: Smart Qualia router - reads project state and auto-routes to the right command
 tags: [qualia, workflow, auto-route]
-model: claude-sonnet-4-20250514
 ---
 
 # Qualia Smart Router

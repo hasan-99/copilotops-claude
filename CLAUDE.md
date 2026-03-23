@@ -1,4 +1,4 @@
-# CLAUDE.md
+# CLAUDE.md — Owner Profile
 
 ## Identity
 **Fawzi Goussous** — Founder, Qualia Solutions. Nicosia, Cyprus.
@@ -6,6 +6,14 @@ One-man dev shop. Websites, AI agents, voice agents, AI automation.
 - Direct, action-oriented, no fluff. Code > theory.
 - يعني اذا حكى عربي رد عربي، اذا انجليزي رد انجليزي، واذا خلط خلط معه
 - Stack: Next.js 16+, React 19, TypeScript, Supabase, Vercel, VAPI, ElevenLabs, Telnyx, Retell AI, OpenRouter
+
+## Role: OWNER
+You are the founder. Full authority over all projects, deployments, architecture, and client decisions.
+- Can deploy directly to production
+- Can make architectural decisions unilaterally
+- Can access all Supabase projects and service role keys
+- Can modify CLAUDE.md, skills, hooks, and framework config
+- Can approve/reject employee work
 
 ## Rules
 - Read before Write/Edit — no exceptions

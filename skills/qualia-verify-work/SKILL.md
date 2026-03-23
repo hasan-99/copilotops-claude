@@ -68,7 +68,25 @@ Document gaps in UAT.md. For each gap:
 Then offer:
 > "Found {N} issues. Run `/qualia-plan-phase {phase} --gaps` to create fix plans, then `/qualia-execute-phase {phase} --gaps-only` to fix them."
 
-### 5. Design Quality Check (Frontend Phases)
+### 5. Shipping Checklist Cross-Reference
+
+After UAT testing, cross-reference results against the relevant shipping checklist from `~/Projects/live/qualia/docs/completion-checklists.md`.
+
+Detect project type from `.planning/PROJECT.md` or `package.json` and load:
+- **website** → "Website-Specific Checklist" + "Universal Checklist"
+- **agent** → "AI Agent Checklist" + "Universal Checklist"
+- **voice** → "Voice Agent Checklist" + "Universal Checklist"
+- **mobile** → "Mobile App Checklist" + "Universal Checklist"
+- **platform** → "Platform with LLM Checklist" + "Universal Checklist"
+
+For items relevant to this phase's scope, verify each one:
+- Run automated checks where possible (grep for service_role, check meta tags, etc.)
+- Add unchecked items as additional UAT entries in the phase UAT.md
+- Report: "Shipping checklist: X/Y items verified for this phase"
+
+Do NOT check items outside this phase's scope (e.g., don't check deployment items during a Phase 1 verify).
+
+### 6. Design Quality Check (Frontend Phases)
 
 If the phase involves frontend work (detected from PLAN.md file references or phase description), after UAT passes with zero issues, suggest the design quality workflow:
 
@@ -76,7 +94,7 @@ If the phase involves frontend work (detected from PLAN.md file references or ph
 
 This is advisory — user can skip by running the next command directly.
 
-### 6. Update State
+### 7. Update State
 
 Update `.planning/STATE.md` to reflect verification status.
 

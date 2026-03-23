@@ -42,3 +42,5 @@ archive/
 # Ephemeral session/cache data
 image-cache/
 sessions/
+venv/
+*.pyc

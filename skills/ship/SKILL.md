@@ -27,6 +27,24 @@ Detect project type from codebase signals:
 
 If ambiguous, ask user. If pure edge functions, skip tsc/eslint quality gates.
 
+## Shipping Checklist Gate
+
+Before deploying, load the relevant shipping checklist from `~/Projects/live/qualia/docs/completion-checklists.md`:
+
+- **website** → "Website-Specific Checklist" + "Universal Checklist"
+- **agent** → "AI Agent Checklist" + "Universal Checklist"
+- **voice** → "Voice Agent Checklist" + "Universal Checklist"
+- **mobile** → "Mobile App Checklist" + "Universal Checklist"
+- **platform** → "Platform with LLM Checklist" + "Universal Checklist"
+
+After quality gates pass (Step 2), scan the codebase against each checklist item and report:
+- PASS: item verified automatically (e.g., grep found no service_role in client code)
+- WARN: could not verify automatically — needs manual check
+- FAIL: item clearly not met (e.g., no meta descriptions found)
+
+Any FAIL items are **deploy blockers** — report them and ask if user wants to fix first or ship anyway.
+Include the checklist results in the final deploy report (Step 8).
+
 ## Steps
 
 ### 1. Identify Project

@@ -41,14 +41,27 @@ Walk through every item in REQUIREMENTS.md Definition of Done:
 
 Scan phase summaries and verification files for noted tech debt, workarounds, or deferred items. Compile a tech debt list.
 
-### 5. Integration Check
+### 5. Shipping Checklist Audit
+
+Run the full shipping checklist from `~/Projects/live/qualia/docs/completion-checklists.md` as part of the audit.
+
+Detect project type from `.planning/PROJECT.md` and load the matching checklist:
+- **website** → "Website-Specific Checklist" + "Universal Checklist"
+- **agent** → "AI Agent Checklist" + "Universal Checklist"
+- **voice** → "Voice Agent Checklist" + "Universal Checklist"
+- **mobile** → "Mobile App Checklist" + "Universal Checklist"
+- **platform** → "Platform with LLM Checklist" + "Universal Checklist"
+
+For every checklist item, run automated verification where possible. Include a "Shipping Checklist" section in the audit report with PASS/WARN/FAIL per item. FAIL items contribute to the overall PASS/FAIL decision.
+
+### 6. Integration Check
 
 Spawn an integration checker to verify cross-phase functionality:
 - Do features from different phases work together?
 - Are there any conflicts or regressions?
 - End-to-end user flows work?
 
-### 6. Produce Audit Report
+### 7. Produce Audit Report
 
 Write `v{version}-MILESTONE-AUDIT.md`:
 
@@ -72,7 +85,7 @@ Write `v{version}-MILESTONE-AUDIT.md`:
 ## Overall: PASS / FAIL
 ```
 
-### 7. Route
+### 8. Route
 
 **If PASS**: "Milestone audit passed. Run `/qualia-complete-milestone` to archive and tag."
 
