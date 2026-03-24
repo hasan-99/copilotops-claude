@@ -34,7 +34,12 @@ ide/
 context-states/
 backups/
 plugins/
-knowledge/
+# Knowledge — include shared files, exclude personal/sensitive
+knowledge/session-digest.md
+knowledge/optimization-research*.md
+knowledge/employees.md
+knowledge/email-signature.html
+knowledge/project-notes/
 
 # Archive (old rotated files)
 archive/
