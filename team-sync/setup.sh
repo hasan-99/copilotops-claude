@@ -148,10 +148,44 @@ fi
 
 # ---- Settings.json ----
 if [ ! -f "$CLAUDE_DIR/settings.json" ]; then
-    cp "$REPO_DIR/team-sync/settings.json.template" "$CLAUDE_DIR/settings.json" 2>/dev/null || true
-    echo "-> settings.json created — FILL IN YOUR API KEYS"
+    sed "s|{{HOME}}|$HOME|g" "$REPO_DIR/team-sync/settings.json.template" > "$CLAUDE_DIR/settings.json"
+    echo "-> settings.json created"
 else
     echo "-> settings.json exists (keeping yours)"
+fi
+
+# ---- Session digest ----
+DIGEST_FILE="$CLAUDE_DIR/knowledge/session-digest.md"
+if [ ! -f "$DIGEST_FILE" ]; then
+    cat > "$DIGEST_FILE" << 'DIGESTEOF'
+# Session Digest — Rolling Log
+> Auto-updated by save-session-state.sh. Last 20 sessions across all projects.
+
+DIGESTEOF
+    echo "-> session-digest.md initialized"
+fi
+
+# ---- .env.claude ----
+ENV_CLAUDE="$CLAUDE_DIR/.env.claude"
+if [ ! -f "$ENV_CLAUDE" ]; then
+    echo "-> Creating .env.claude (add your API keys here)..."
+    cat > "$ENV_CLAUDE" << 'ENVEOF'
+# Qualia Solutions — Claude Code Environment Variables
+# Add your API keys below. This file is loaded via CLAUDE_ENV_FILE.
+
+# Portal integration (for session tracking)
+# CLAUDE_PORTAL_API_KEY=
+
+# MCP server tokens (uncomment and fill if needed)
+# VAPI_TOKEN=
+# TELNYX_API_KEY=
+# ELEVENLABS_API_KEY=
+# FIRECRAWL_API_KEY=
+ENVEOF
+    chmod 600 "$ENV_CLAUDE"
+    echo "  OK .env.claude (edit to add your keys)"
+else
+    echo "-> .env.claude exists (keeping yours)"
 fi
 
 # ---- MCP Servers ----

@@ -75,7 +75,7 @@ You are a team member. Communicate proactively:
 - Use `/learn` after mistakes to improve the system for everyone
 
 ## Compaction — ALWAYS preserve:
-Project path/name/ref, branch, modified files, decisions, test results, in-progress work, errors
+Project path/name/ref, branch, modified files, decisions, test results, in-progress work, errors, Qualia phase/milestone state, session digest context. When compacting, include the rolling session digest from ~/.claude/knowledge/session-digest.md so cross-project awareness survives compaction.
 
 ## Key Resources
 - Onboarding: ~/Projects/live/qualia/docs/trainee-onboarding.md

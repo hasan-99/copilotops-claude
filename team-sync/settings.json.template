@@ -3,17 +3,22 @@
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
     "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "0",
     "CLAUDE_CODE_SUBAGENT_MODEL": "claude-opus-4-6",
-    "ENABLE_TOOL_SEARCH": "true",
+    "ENABLE_TOOL_SEARCH": "auto:5",
     "MAX_MCP_OUTPUT_TOKENS": "25000",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
-    "SUDO_ASKPASS": "/home/qualia/.claude/askpass.sh"
+    "CLAUDE_ENV_FILE": "{{HOME}}/.claude/.env.claude"
   },
   "permissions": {
     "allow": [
       "Skill(dev-browser:dev-browser)",
       "Bash(npx tsx:*)",
-      "Bash(find:*)",
-      "Bash(sudo -A *)"
+      "Bash(find:*)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./secrets/**)",
+      "Read(./.credentials.json)"
     ]
   },
   "hooks": {
@@ -37,7 +42,7 @@
         ]
       },
       {
-        "matcher": "Bash(rm -rf:*)",
+        "matcher": "Bash",
         "hooks": [
           {
             "type": "command",
@@ -91,17 +96,25 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/pre-compact.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/context-manager.sh"
           }
         ]
       }
     ],
     "SessionStart": [
       {
-        "matcher": "",
+        "matcher": "startup",
         "hooks": [
           {
             "type": "command",
             "command": "~/.claude/hooks/session-context-loader.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/retention-cleanup.sh"
           }
         ]
       }
@@ -124,6 +137,10 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/save-session-state.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/session-learn.sh"
           }
         ]
       }
@@ -138,14 +155,6 @@
     "supabase@claude-plugins-official": true
   },
   "mcpServers": {
-    "filesystem": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-filesystem",
-        "/home/qualiasolutions"
-      ]
-    },
     "context7": {
       "command": "npx",
       "args": [
@@ -159,39 +168,10 @@
         "-y",
         "@playwright/mcp@latest"
       ]
-    },
-    "vapi": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@vapi-ai/mcp-server"
-      ],
-      "env": {
-        "VAPI_TOKEN": "d616dd43-3770-452a-9337-526f392dc480"
-      }
-    },
-    "telnyx_api": {
-      "command": "telnyx-mcp-server",
-      "args": [],
-      "env": {
-        "TELNYX_API_KEY": "KEY019ABFC802BE9DF48B26CB5E7DFEFD14_KsPeq4x6AJvz7D9ZjNMvxU",
-        "TELNYX_MCP_TOOLS": "get_phone_number,get_message,list_assistants,mcp_telnyx_delete_assistant,get_assistant_texml,cloud_storage_list_buckets,list_embedded_buckets,get_webhook_events,start_assistant_call,send_message,make_call,hangup,speak,transfer,send_dtmf,playback_start,playback_stop"
-      }
-    },
-    "elevenlabs": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@anthropic/elevenlabs-mcp-server"
-      ],
-      "env": {
-        "ELEVENLABS_API_KEY": "sk_7ed98c8dfe85842183561244ebc3e7120ac291b7005ec0ca"
-      }
     }
   },
-  "skipDangerousModePermissionPrompt": true,
   "statusLine": {
     "type": "command",
-    "command": "bash /home/qualia/.claude/statusline-command.sh"
+    "command": "bash {{HOME}}/.claude/statusline-command.sh"
   }
 }

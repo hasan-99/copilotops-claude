@@ -1,93 +1,101 @@
 #!/bin/bash
-# SessionStart hook — loads full session context into Claude's awareness
-# Reads MEMORY.md + last session state + current project state
+# SessionStart hook — cross-project awareness + stale knowledge warnings
+# Reads: pre-compact state, session digest, knowledge staleness, project pulse
 
 SESSION_DIR="$HOME/.claude/session-env"
 COMPACT_FILE="$SESSION_DIR/pre-compact.json"
-LATEST_SESSION=$(ls -t "$SESSION_DIR"/session_*.json 2>/dev/null | head -1)
-
-# Find MEMORY.md (user-specific path)
-MEMORY_FILE=""
-for f in "$HOME/.claude/projects/-home-$(whoami)--claude/memory/MEMORY.md" \
-         "$HOME/.claude/projects/-home-$(whoami)/memory/MEMORY.md"; do
-    [ -f "$f" ] && MEMORY_FILE="$f" && break
-done
+KNOWLEDGE_DIR="$HOME/.claude/knowledge"
+DIGEST_FILE="$KNOWLEDGE_DIR/session-digest.md"
 
 json_val() {
     node -e "try{const d=JSON.parse(require('fs').readFileSync('$1','utf8'));const v=$2;if(v&&v!=='null')process.stdout.write(String(v))}catch(e){}" 2>/dev/null
 }
 
-# === Build the full context message ===
 MSG=""
 
-# 1. Last session info
+# --- 1. Last session state (from pre-compact snapshot) ---
 if [ -f "$COMPACT_FILE" ]; then
+    TIMESTAMP=$(json_val "$COMPACT_FILE" "d.timestamp")
     PROJECT=$(json_val "$COMPACT_FILE" "d.project_name")
-    WORKDIR=$(json_val "$COMPACT_FILE" "d.working_directory")
     BRANCH=$(json_val "$COMPACT_FILE" "d.git_branch")
     PHASE=$(json_val "$COMPACT_FILE" "d.qualia_phase||d.gsd_phase")
-    MILESTONE=$(json_val "$COMPACT_FILE" "d.qualia_milestone||d.gsd_milestone")
     Q_TASK=$(json_val "$COMPACT_FILE" "d.qualia_task||d.gsd_task")
-    TIMESTAMP=$(json_val "$COMPACT_FILE" "d.timestamp")
 
-    [ -n "$PROJECT" ] && [ "$PROJECT" != ".claude" ] && MSG="${MSG}Last session project: ${PROJECT}. "
-    [ -n "$BRANCH" ] && MSG="${MSG}Branch: ${BRANCH}. "
-    [ -n "$PHASE" ] && MSG="${MSG}Phase: ${PHASE}. "
-    [ -n "$MILESTONE" ] && MSG="${MSG}Milestone: ${MILESTONE}. "
-    [ -n "$Q_TASK" ] && MSG="${MSG}Last activity: ${Q_TASK}. "
-    [ -n "$TIMESTAMP" ] && MSG="${MSG}Last active: ${TIMESTAMP}. "
+    [ -n "$TIMESTAMP" ] && MSG="Last active: ${TIMESTAMP}."
+    [ -n "$PROJECT" ] && [ "$PROJECT" != ".claude" ] && MSG="${MSG} Project: ${PROJECT}."
+    [ -n "$BRANCH" ] && MSG="${MSG} Branch: ${BRANCH}."
+    [ -n "$PHASE" ] && MSG="${MSG} Phase: ${PHASE}."
+    [ -n "$Q_TASK" ] && MSG="${MSG} Task: ${Q_TASK}."
 fi
 
-# 2. Current directory context
+# --- 2. Current directory project state ---
 CWD=$(pwd)
-CWD_PROJECT=$(basename "$CWD")
 if [ -f "$CWD/.planning/STATE.md" ]; then
     CUR_PHASE=$(grep -m1 "^Phase:" "$CWD/.planning/STATE.md" 2>/dev/null | sed 's/^Phase: *//')
-    CUR_MILESTONE=$(grep -m1 "^## Milestone" "$CWD/.planning/STATE.md" 2>/dev/null | sed 's/^## //')
     CUR_STATUS=$(grep -m1 "^Status:" "$CWD/.planning/STATE.md" 2>/dev/null | sed 's/^Status: *//')
-    MSG="${MSG}Current project: ${CWD_PROJECT}. "
-    [ -n "$CUR_PHASE" ] && MSG="${MSG}Active phase: ${CUR_PHASE}. "
-    [ -n "$CUR_MILESTONE" ] && MSG="${MSG}${CUR_MILESTONE}. "
-    [ -n "$CUR_STATUS" ] && MSG="${MSG}Status: ${CUR_STATUS}. "
+    [ -n "$CUR_PHASE" ] && MSG="${MSG} Active: ${CUR_PHASE}."
+    [ -n "$CUR_STATUS" ] && MSG="${MSG} Status: ${CUR_STATUS}."
 fi
 
-# 3. Load MEMORY.md content (the actual intelligence)
-MEMORY_CONTENT=""
-if [ -n "$MEMORY_FILE" ] && [ -f "$MEMORY_FILE" ]; then
-    MEMORY_CONTENT=$(cat "$MEMORY_FILE")
+# --- 3. Recent session digest (cross-project awareness) ---
+if [ -f "$DIGEST_FILE" ]; then
+    # Show last 5 sessions from digest (skip header lines)
+    RECENT=$(tail -n +4 "$DIGEST_FILE" | head -5)
+    if [ -n "$RECENT" ]; then
+        MSG="${MSG}
+Recent sessions across projects:
+${RECENT}"
+    fi
 fi
 
-# 4. Load learned patterns summary
-LEARNED=""
-LEARNED_FILE="$HOME/.claude/knowledge/learned-patterns.md"
-if [ -f "$LEARNED_FILE" ]; then
-    LEARNED=$(grep "^- " "$LEARNED_FILE" | head -10)
+# --- 4. Stale knowledge detection ---
+STALE=""
+NOW_EPOCH=$(date +%s)
+STALE_DAYS=30
+
+for f in "$KNOWLEDGE_DIR"/*.md; do
+    [ -f "$f" ] || continue
+    BASENAME=$(basename "$f")
+    # Skip session-digest.md (auto-updated) and email-signature.html
+    [ "$BASENAME" = "session-digest.md" ] && continue
+    FILE_EPOCH=$(stat -c %Y "$f" 2>/dev/null || stat -f %m "$f" 2>/dev/null || echo 0)
+    AGE=$(( (NOW_EPOCH - FILE_EPOCH) / 86400 ))
+    if [ "$AGE" -gt "$STALE_DAYS" ]; then
+        STALE="${STALE} ${BASENAME}(${AGE}d)"
+    fi
+done
+
+if [ -n "$STALE" ]; then
+    MSG="${MSG}
+STALE knowledge (>30d):${STALE} — consider updating."
 fi
 
-# === Combine into system message ===
-FULL_MSG="Welcome back. Here is your persistent context:\n\n"
+# --- 5. Project pulse (recent git activity across known projects) ---
+PULSE=""
+PROJECTS_FILE="$KNOWLEDGE_DIR/qualia-context.md"
+if [ -f "$PROJECTS_FILE" ]; then
+    # Scan ~/Projects/live/ and ~/Projects/aiagents/ for recent commits (last 7 days)
+    for DIR in "$HOME/Projects/live/"*/ "$HOME/Projects/aiagents/"*/; do
+        [ -d "$DIR/.git" ] || continue
+        PROJ=$(basename "$DIR")
+        LAST_COMMIT=$(git -C "$DIR" log --oneline -1 --since="7 days ago" --format="%ar" 2>/dev/null)
+        if [ -n "$LAST_COMMIT" ]; then
+            PULSE="${PULSE} ${PROJ}(${LAST_COMMIT})"
+        fi
+    done
+fi
 
+if [ -n "$PULSE" ]; then
+    MSG="${MSG}
+Active projects (7d):${PULSE}"
+fi
+
+# --- Output ---
 if [ -n "$MSG" ]; then
-    FULL_MSG="${FULL_MSG}SESSION: ${MSG}\n\n"
+    echo "${MSG}
+Rules: MEMORY.md + learned-patterns.md (read on demand)."
+else
+    echo "Fresh session. Rules: MEMORY.md + learned-patterns.md (read on demand)."
 fi
-
-if [ -n "$MEMORY_CONTENT" ]; then
-    FULL_MSG="${FULL_MSG}MEMORY INDEX:\n${MEMORY_CONTENT}\n\n"
-fi
-
-if [ -n "$LEARNED" ]; then
-    FULL_MSG="${FULL_MSG}KEY RULES:\n${LEARNED}\n"
-fi
-
-# Escape for JSON
-ESCAPED=$(echo -e "$FULL_MSG" | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))" 2>/dev/null)
-# Remove outer quotes from python json.dumps
-ESCAPED=${ESCAPED:1:-1}
-
-cat << EOF
-{
-  "systemMessage": "${ESCAPED}"
-}
-EOF
 
 exit 0

@@ -41,13 +41,10 @@ Be honest. Default to action. Never speculate on unread code. Say when blocked.
 - `/compact` at 60%. `/clear` between tasks. `/learn` after mistakes.
 
 ## Compaction — ALWAYS preserve:
-Project path/name/ref, branch, modified files, decisions, test results, in-progress work, errors
+Project path/name/ref, branch, modified files, decisions, test results, in-progress work, errors, Qualia phase/milestone state, session digest context. When compacting, include the rolling session digest from ~/.claude/knowledge/session-digest.md so cross-project awareness survives compaction.
 
-## Project Quick-Ref (Supabase refs)
-aquador:`hznpuxplqgszbacxzbhv` | maud:`vspyxscitcuwnrhchskl` | vero:`zskfdlqyzhkzefafqkpx`
-aibossbrainz:`esymbjpzjjkffpfqukxw` | mpm:`llherorsfgbdyqkrrlpc` | zaid:`uoqiwidqlsoamtugioik`
-dababneh:`toovladeybmlyzblqtbl` | faris:`lrgwxcqqnhxvvrruepcv` | hammah:`ctcikdcjhxxqogwvtzrc`
-sofiatesting:`vceeheaxcrhmpqueudqx` | timo:`qgaqvkmqterlljbegniu` | under:`vvppyijxpgeeijiozlve`
+## Project Quick-Ref
+Supabase refs are in MEMORY.md. Read on demand — don't load every session.
 
 ## Gotchas
 - sigatalachana = Python agent (NOT web), misclassified in aiagents

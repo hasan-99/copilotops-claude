@@ -122,11 +122,46 @@ $settingsFile = Join-Path $CLAUDE_DIR "settings.json"
 if (-not (Test-Path $settingsFile)) {
     $template = Join-Path $REPO_DIR "team-sync\settings.json.template"
     if (Test-Path $template) {
-        Copy-Item $template $settingsFile
-        Write-Host "-> settings.json created — FILL IN YOUR API KEYS" -ForegroundColor Yellow
+        $content = Get-Content $template -Raw
+        $content = $content -replace '\{\{HOME\}\}', $env:USERPROFILE
+        $content | Set-Content $settingsFile -Encoding UTF8
+        Write-Host "-> settings.json created" -ForegroundColor Green
     }
 } else {
     Write-Host "-> settings.json exists (keeping yours)" -ForegroundColor Green
+}
+
+# ---- Session digest ----
+$digestFile = Join-Path $CLAUDE_DIR "knowledge\session-digest.md"
+if (-not (Test-Path $digestFile)) {
+    New-Item -ItemType Directory -Force -Path (Join-Path $CLAUDE_DIR "knowledge") | Out-Null
+    @"
+# Session Digest — Rolling Log
+> Auto-updated by save-session-state.sh. Last 20 sessions across all projects.
+
+"@ | Set-Content $digestFile -Encoding UTF8
+    Write-Host "-> session-digest.md initialized" -ForegroundColor Green
+}
+
+# ---- .env.claude ----
+$envClaude = Join-Path $CLAUDE_DIR ".env.claude"
+if (-not (Test-Path $envClaude)) {
+    @"
+# Qualia Solutions — Claude Code Environment Variables
+# Add your API keys below. This file is loaded via CLAUDE_ENV_FILE.
+
+# Portal integration (for session tracking)
+# CLAUDE_PORTAL_API_KEY=
+
+# MCP server tokens (uncomment and fill if needed)
+# VAPI_TOKEN=
+# TELNYX_API_KEY=
+# ELEVENLABS_API_KEY=
+# FIRECRAWL_API_KEY=
+"@ | Set-Content $envClaude -Encoding UTF8
+    Write-Host "-> .env.claude created (edit to add your keys)" -ForegroundColor Yellow
+} else {
+    Write-Host "-> .env.claude exists (keeping yours)" -ForegroundColor Green
 }
 
 # ---- MCP Servers ----
