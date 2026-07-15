@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Qualia Framework — Reference</title>
+<style>
+  :root {
+    --teal: #00ced1;
+    --teal-glow: #00aab0;
+    --teal-dim: #008285;
+    --bg: #0b1415;
+    --bg-subtle: #0f1c1e;
+    --bg-card: #121f21;
+    --text: #dce1e6;
+    --text-muted: #6b7a85;
+    --text-subtle: #4a5560;
+    --border: #1a2e30;
+    --green: #34d399;
+    --yellow: #eab308;
+    --red: #ef4444;
+    --blue: #60a5fa;
+    --font-display: 'Outfit', system-ui, sans-serif;
+    --font-body: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── Version Pill (top-right) ───────────── */
+  .version-pill {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 10;
+    padding: 0.3rem 0.75rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--teal);
+    letter-spacing: 0.04em;
+  }
+
+  /* ─── Header ─────────────────────────────── */
+  .header {
+    padding: clamp(2rem, 6vw, 4rem) clamp(1.5rem, 5vw, 4rem);
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(160deg, var(--bg-subtle), var(--bg));
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -40%;
+    right: -10%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(0,206,209,0.08), transparent 70%);
+    pointer-events: none;
+  }
+  .header-content { position: relative; max-width: 900px; margin: 0 auto; }
+  .header h1 {
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: clamp(2rem, 1rem + 3vw, 3rem);
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+  .header h1 span { color: var(--teal); font-weight: 600; }
+  .header p {
+    color: var(--text-muted);
+    font-size: 1rem;
+    margin-top: 0.75rem;
+    max-width: 50ch;
+  }
+  .version {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.25rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--teal-dim);
+  }
+
+  /* ─── Layout ─────────────────────────────── */
+  .content {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: clamp(2rem, 5vw, 4rem) clamp(1.5rem, 5vw, 4rem);
+  }
+
+  /* ─── Sections ───────────────────────────── */
+  section { margin-bottom: 3.5rem; }
+  section h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.35rem;
+    letter-spacing: -0.01em;
+    color: var(--teal);
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ─── The Road ───────────────────────────── */
+  .road {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    margin: 1.5rem 0;
+  }
+  .road-step {
+    padding: 0.5rem 1rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text);
+    transition: border-color 0.15s ease-out;
+  }
+  .road-step:hover { border-color: var(--teal-dim); }
+  .road-arrow { color: var(--text-subtle); font-size: 0.9rem; }
+
+  /* ─── Command Cards ──────────────────────── */
+  .commands { display: grid; gap: 0.75rem; }
+  .cmd-group { margin-bottom: 1.5rem; }
+  .cmd-group h3 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-subtle);
+    margin-bottom: 0.75rem;
+  }
+  .cmd-group-note {
+    font-size: 0.78rem;
+    color: var(--text-subtle);
+    margin: -0.5rem 0 0.75rem 0;
+    font-style: italic;
+  }
+  .cmd {
+    display: flex;
+    gap: 1rem;
+    align-items: baseline;
+    padding: 0.625rem 1rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    transition: border-color 0.15s ease-out;
+  }
+  .cmd:hover { border-color: var(--teal-dim); }
+  .cmd-name {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--teal);
+    white-space: nowrap;
+    min-width: 200px;
+  }
+  .cmd-desc {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  /* ─── Rules ──────────────────────────────── */
+  .rules { list-style: none; }
+  .rules li {
+    padding: 0.625rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+    display: flex;
+    gap: 0.75rem;
+    align-items: baseline;
+  }
+  .rules li:last-child { border-bottom: none; }
+  .rule-icon { color: var(--teal); font-size: 0.85rem; flex-shrink: 0; }
+
+  /* ─── Services ───────────────────────────── */
+  .services {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 0.75rem;
+  }
+  .service {
+    padding: 1rem 1.25rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    transition: border-color 0.15s ease-out;
+  }
+  .service:hover { border-color: var(--teal-dim); }
+  .service-name {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: var(--text);
+    margin-bottom: 0.25rem;
+  }
+  .service-desc { font-size: 0.8rem; color: var(--text-muted); }
+  .service-key {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--teal-dim);
+    margin-top: 0.5rem;
+  }
+
+  /* ─── Scoring ────────────────────────────── */
+  .scoring {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.75rem;
+  }
+  .score-dim {
+    padding: 1rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    text-align: center;
+  }
+  .score-dim h4 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    color: var(--teal);
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+  }
+  .score-dim p { font-size: 0.78rem; color: var(--text-muted); }
+  .score-bar {
+    display: flex;
+    gap: 3px;
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+  .score-bar span {
+    width: 18px;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--border);
+  }
+  .score-bar span.filled { background: var(--teal); }
+  .score-bar span.threshold { background: var(--yellow); }
+
+  /* ─── Footer ─────────────────────────────── */
+  .footer {
+    padding: 2rem clamp(1.5rem, 5vw, 4rem);
+    border-top: 1px solid var(--border);
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-subtle);
+  }
+  .footer strong { color: var(--teal); font-weight: 500; }
+  .footer-version {
+    display: block;
+    margin-top: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-subtle);
+    letter-spacing: 0.04em;
+  }
+
+  /* ─── Responsive ─────────────────────────── */
+  @media (max-width: 640px) {
+    .cmd { flex-direction: column; gap: 0.25rem; }
+    .cmd-name { min-width: unset; }
+    .road { flex-direction: column; align-items: flex-start; }
+    .road-arrow { display: none; }
+    .version-pill { top: 0.5rem; right: 0.5rem; font-size: 0.65rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: 0.01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="version-pill">{{VERSION}}</div>
+
+<div class="header">
+  <div class="header-content">
+    <h1><span>Qualia</span> Framework</h1>
+    <p>Plan, build, verify, ship. The AI-powered workflow for Qualia Solutions.</p>
+    <div class="version">{{VERSION}} &middot; 35 skills</div>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- The Road -->
+  <section>
+    <h2>The Road</h2>
+    <p style="color: var(--text-muted); margin-bottom: 1rem;">Every project follows this path. No exceptions.</p>
+    <div class="road">
+      <div class="road-step">/qualia-new</div>
+      <span class="road-arrow">&rarr;</span>
+      <div class="road-step">/qualia-plan</div>
+      <span class="road-arrow">&rarr;</span>
+      <div class="road-step">/qualia-build</div>
+      <span class="road-arrow">&rarr;</span>
+      <div class="road-step">/qualia-verify</div>
+      <span class="road-arrow">&rarr;</span>
+      <div class="road-step">/qualia-polish</div>
+      <span class="road-arrow">&rarr;</span>
+      <div class="road-step">/qualia-ship</div>
+      <span class="road-arrow">&rarr;</span>
+      <div class="road-step">/qualia-handoff</div>
+      <span class="road-arrow">&rarr;</span>
+      <div class="road-step">/qualia-report</div>
+    </div>
+  </section>
+
+  <!-- Skills -->
+  <section>
+    <h2>Skills</h2>
+
+    <!-- Road (core flow) -->
+    <div class="cmd-group">
+      <h3>Road &mdash; Core Flow</h3>
+      <p class="cmd-group-note">The seven steps every project walks through.</p>
+      <div class="commands">
+        <div class="cmd"><span class="cmd-name">/qualia-new</span><span class="cmd-desc">Set up a new project from scratch &mdash; deep questioning, parallel research, REQUIREMENTS.md, ROADMAP.md, approval gate. Use when starting any new client project.</span></div>
+        <div class="cmd"><span class="cmd-name">/qualia-plan</span><span class="cmd-desc">Plan the current phase &mdash; spawns planner, validates with plan-checker in a revision loop (max 2), optionally runs discuss/research first. Use when ready to plan a phase.</span></div>
+        <div class="cmd"><span class="cmd-name">/qualia-build</span><span class="cmd-desc">Execute the current phase &mdash; spawns builder subagents per task with wave-based parallelization. Fresh context per task.</span></div>
+        <div class="cmd"><span class="cmd-name">/qualia-verify</span><span class="cmd-desc">Goal-backward verification &mdash; checks if the phase ACTUALLY works, not just if tasks completed. Spawns verifier agent.</span></div>
+        <div class="cmd"><span class="cmd-name">/qualia-polish</span><span class="cmd-desc">Design and UX pass &mdash; anti-AI-slop, genuine craft, responsive, accessible. Run after all phases are verified.</span></div>
+        <div class="cmd"><span class="cmd-name">/qualia-ship</span><span class="cmd-desc">Deploy to production &mdash; quality gates, commit, push, deploy, verify. Use when ready to go live.</span></div>
+        <div class="cmd"><span class="cmd-name">/qualia-handoff</span><span class="cmd-desc">Client delivery &mdash; credentials, handover doc, final update. Use after shipping.</span></div>
+      </div>
+    </div>
+
+    <!-- Phase Depth (optional) -->
+    <div class="cmd-group">
+      <h3>Phase Depth &mdash; Optional</h3>
+      <p class="cmd-group-note">Used before / around /qualia-plan when a phase needs deeper context.</p>
+      <div class="commands">
+        <div class="cmd"><span class="cmd-name">/qualia-scope</span><span class="cmd-desc">Unified intake. No args: non-technical kickoff discovery before /qualia-new. With N: archetype-aware adversarial grill before /qualia-plan, gated on Definition-of-Done. Use for complex phases with regulatory, compliance, or architectural stakes. Creates .planning/phase-{N}-context.md that the planner honors as locked input.</span></div>
+        <div class="cmd"><span class="cmd-name">/qualia-research</span><span class="cmd-desc">Deep-research a niche domain or library BEFORE planning a specific phase. Spawns the researcher agent with Context7/WebFetch access. Writes to .planning/phase-{N}-research.md.</span></div>
+        <div class="cmd"><span class="cmd-name">/qualia-map</span><span class="cmd-desc">Map an existing codebase to infer architecture, stack, conventions, and what's already built. For brownfield projects &mdash; run BEFORE /qualia-new so Validated requirements get inferred from existing code.</span></div>
+        <div class="cmd"><span class="cmd-name">/qualia-milestone</span><span class="cmd-desc">Close out a completed milestone and prep the next one. Archives the current milestone's artifacts, updates REQUIREMENTS.md to mark v1 requirements Complete, and creates the next milestone roadmap.</span></div>
+      </div>
+    </div>
+
+    <!-- Quality -->
+    <div class="cmd-group">
+      <h3>Quality</h3>
+      <p class="cmd-group-note">Fix, diagnose, audit, optimize, polish, test.</p>
+      <div class="commands">
+        <div class="cmd"><span class="cmd-name">/qualia-doctor</span><span class="cmd-desc">Framework health check &mdash; install, state, contracts, memory, hooks, and ERP queue. Use when Qualia itself feels broken or Codex/Claude is not picking it up.</span></div>
+        <div class="cmd"><span class="cmd-name">/qualia-fix</span><span class="cmd-desc">Repair broken existing behavior &mdash; build a feedback loop, find root cause, patch minimally, verify, write a fix report. Trigger on 'fix this', 'bug', 'broken', 'failing test', 'regression'.</span></div>
+        <div class="cmd"><span class="cmd-name">/qualia-review</span><span class="cmd-desc">Read-only production audit with scored diagnostics. Runs real commands, scores findings by severity, then routes repairs to /qualia-fix, /qualia-polish, or /qualia-optimize.</span></div>
+        <div class="cmd"><span class="cmd-name">/qualia-optimize</span><span class="cmd-desc">Deep improvement discovery &mdash; reads .planning/ AND codebase to find performance, design, UI, backend, alignment, and architecture opportunities. Writes OPTIMIZE.md/RFCs; specific repairs route through /qualia-fix.</span></div>
+        <div class="cmd"><span class="cmd-name">/qualia-test</span><span class="cmd-desc">Generate or run tests for client projects. Trigger on 'write tests', 'add tests', 'test this', 'test coverage'.</span></div>
+      </div>
+    </div>
+
+    <!-- Quick Paths -->
+    <div class="cmd-group">
+      <h3>Quick Paths</h3>
+      <p class="cmd-group-note">Lightweight alternatives when the full road is overkill.</p>
+      <div class="commands">
+        <div class="cmd"><span class="cmd-name">/qualia-feature</span><span class="cmd-desc">Auto-scoped new-feature build. Inline for trivia (copy, config), fresh builder spawn for 1-5 file features. Broken existing behavior routes to /qualia-fix. Flags: --force-spawn, --force-inline.</span></div>
+        <div class="cmd"><span class="cmd-name">/qualia-polish</span><span class="cmd-desc">Visual quality pass, scope-adaptive &mdash; component, route, full app, redesign, critique, quick. It fixes style/layout/accessibility only; functional bugs route to /qualia-fix.</span></div>
+        <div class="cmd"><span class="cmd-name">/qualia-polish --vibe</span><span class="cmd-desc">Fast aesthetic-token pivot (~3 min) &mdash; swap color, type, depth, and motion, keep layout untouched. Structural redesign routes to /qualia-polish --redesign.</span></div>
+      </div>
+    </div>
+
+    <!-- Knowledge -->
+    <div class="cmd-group">
+      <h3>Knowledge</h3>
+      <p class="cmd-group-note">Persist learnings and log work.</p>
+      <div class="commands">
+        <div class="cmd"><span class="cmd-name">/qualia-learn</span><span class="cmd-desc">Save a learning, pattern, fix, or client preference to the knowledge base. Persists across projects and sessions.</span></div>
+        <div class="cmd"><span class="cmd-name">/qualia-report</span><span class="cmd-desc">Generate session report and commit to repo. Mandatory before clock-out.</span></div>
+      </div>
+    </div>
+
+    <!-- Session -->
+    <div class="cmd-group">
+      <h3>Session</h3>
+      <p class="cmd-group-note">Hand off and resume context cleanly.</p>
+      <div class="commands">
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="cmd-group">
+      <h3>Navigation</h3>
+      <p class="cmd-group-note">When you don't know what to do next.</p>
+      <div class="commands">
+        <div class="cmd"><span class="cmd-name">/qualia</span><span class="cmd-desc">Smart router &mdash; reads project state, classifies your situation, tells you the exact next command. Use whenever you're unsure about your next step.</span></div>
+        <div class="cmd"><span class="cmd-name">/qualia-road</span><span class="cmd-desc">Terminal workflow map — Project → Journey → Milestones → Phases → Tasks. Use in headless/SSH sessions or when you want the road in chat instead of the browser.</span></div>
+      </div>
+    </div>
+
+    <!-- Meta -->
+    <div class="cmd-group">
+      <h3>Meta</h3>
+      <p class="cmd-group-note">Extend the framework itself.</p>
+      <div class="commands">
+        <div class="cmd"><span class="cmd-name">/qualia-postmortem</span><span class="cmd-desc">Analyze a verification failure and turn the lesson into a framework improvement.</span></div>
+        <div class="cmd"><span class="cmd-name">/zoho-workflow</span><span class="cmd-desc">Internal Qualia Solutions ops — Zoho Invoice and Mail integration via ERP-first routing.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLI -->
+  <section>
+    <h2>CLI (Terminal)</h2>
+    <div class="cmd-group">
+      <div class="commands">
+        <div class="cmd"><span class="cmd-name">qualia-framework install</span><span class="cmd-desc">Install or reinstall the framework.</span></div>
+        <div class="cmd"><span class="cmd-name">qualia-framework update</span><span class="cmd-desc">Update to the latest version.</span></div>
+        <div class="cmd"><span class="cmd-name">qualia-framework version</span><span class="cmd-desc">Show installed version + check for updates.</span></div>
+        <div class="cmd"><span class="cmd-name">qualia-framework uninstall</span><span class="cmd-desc">Clean removal from installed Claude/Codex homes while preserving user-owned settings.</span></div>
+        <div class="cmd"><span class="cmd-name">qualia-framework migrate</span><span class="cmd-desc">Upgrade legacy settings.json to the current hook layout.</span></div>
+        <div class="cmd"><span class="cmd-name">qualia-framework analytics</span><span class="cmd-desc">Hook telemetry, verification pass rates, gap cycles.</span></div>
+        <div class="cmd"><span class="cmd-name">qualia-framework set-erp-key</span><span class="cmd-desc">Save and enable the ERP API key.</span></div>
+        <div class="cmd"><span class="cmd-name">qualia-framework erp-ping</span><span class="cmd-desc">Verify ERP connectivity and API key health.</span></div>
+        <div class="cmd"><span class="cmd-name">qualia-framework doctor</span><span class="cmd-desc">Health-check installed files, hooks, settings, and knowledge layer.</span></div>
+        <div class="cmd"><span class="cmd-name">qualia-framework flush</span><span class="cmd-desc">Run the non-interactive knowledge flush.</span></div>
+        <div class="cmd"><span class="cmd-name">qualia-framework team</span><span class="cmd-desc">List, add, or remove team members.</span></div>
+        <div class="cmd"><span class="cmd-name">qualia-framework traces</span><span class="cmd-desc">View recent hook activity.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Verification Scoring -->
+  <section>
+    <h2>Verification Scoring</h2>
+    <p style="color: var(--text-muted); margin-bottom: 1rem;">Every phase is scored on 4 dimensions. Any score below 3 = automatic FAIL.</p>
+    <div class="scoring">
+      <div class="score-dim">
+        <h4>Correctness</h4>
+        <p>Does it work as expected?</p>
+        <div class="score-bar"><span class="filled"></span><span class="filled"></span><span class="threshold"></span><span></span><span></span></div>
+      </div>
+      <div class="score-dim">
+        <h4>Completeness</h4>
+        <p>Are all requirements met?</p>
+        <div class="score-bar"><span class="filled"></span><span class="filled"></span><span class="threshold"></span><span></span><span></span></div>
+      </div>
+      <div class="score-dim">
+        <h4>Wiring</h4>
+        <p>Is everything connected end-to-end?</p>
+        <div class="score-bar"><span class="filled"></span><span class="filled"></span><span class="threshold"></span><span></span><span></span></div>
+      </div>
+      <div class="score-dim">
+        <h4>Quality</h4>
+        <p>Code quality, security, a11y?</p>
+        <div class="score-bar"><span class="filled"></span><span class="filled"></span><span class="threshold"></span><span></span><span></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Rules -->
+  <section>
+    <h2>Rules</h2>
+    <ul class="rules">
+      <li><span class="rule-icon">1</span> Feature branches by default &mdash; OWNER overrides must be explicit</li>
+      <li><span class="rule-icon">2</span> Read before write &mdash; understand files before editing</li>
+      <li><span class="rule-icon">3</span> MVP first &mdash; build what's asked, nothing extra</li>
+      <li><span class="rule-icon">4</span> /qualia-report before clock-out &mdash; mandatory shift submission in ERP</li>
+      <li><span class="rule-icon">5</span> Secrets through approved flows &mdash; use set-erp-key or ask Fawzi</li>
+      <li><span class="rule-icon">6</span> Stuck 30+ minutes? Ask Fawzi</li>
+    </ul>
+  </section>
+
+  <!-- Services -->
+  <section>
+    <h2>Our Stack</h2>
+    <div class="services">
+      <div class="service">
+        <div class="service-name">Supabase</div>
+        <div class="service-desc">Database, auth, storage. Every project. MCP + CLI available.</div>
+        <div class="service-key">Always enable RLS</div>
+      </div>
+      <div class="service">
+        <div class="service-name">Vercel</div>
+        <div class="service-desc">Hosting. 3 teams. No auto-deploy &mdash; CLI only via /qualia-ship.</div>
+        <div class="service-key">vercel --prod</div>
+      </div>
+      <div class="service">
+        <div class="service-name">Railway</div>
+        <div class="service-desc">Long-running agents, background jobs. MCP + CLI available.</div>
+        <div class="service-key">railway deploy</div>
+      </div>
+      <div class="service">
+        <div class="service-name">OpenRouter</div>
+        <div class="service-desc">AI model routing. One API key for all models.</div>
+        <div class="service-key">Ask Fawzi for a key</div>
+      </div>
+      <div class="service">
+        <div class="service-name">Retell AI</div>
+        <div class="service-desc">Voice agents. Primary voice platform.</div>
+        <div class="service-key">RETELL_API_KEY</div>
+      </div>
+      <div class="service">
+        <div class="service-name">ElevenLabs</div>
+        <div class="service-desc">Voice synthesis, cloning, streaming.</div>
+        <div class="service-key">ELEVENLABS_API_KEY</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GitHub -->
+  <section>
+    <h2>GitHub Organizations</h2>
+    <div class="services" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+      <div class="service">
+        <div class="service-name">QualiasolutionsCY</div>
+        <div class="service-desc">Primary org. All Qualia Solutions projects.</div>
+      </div>
+      <div class="service">
+        <div class="service-name">SakaniQualia</div>
+        <div class="service-desc">Sakani real estate platform.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div class="footer">
+  <strong>Welcome to the future with Qualia.</strong><br>
+  Qualia Solutions &mdash; Nicosia, Cyprus
+  <span class="footer-version">qualia-framework {{VERSION}} &middot; 35 skills</span>
+</div>
+
+</body>
+</html>

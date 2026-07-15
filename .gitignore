@@ -23,7 +23,17 @@ history.jsonl
 # Personal / Sensitive — NEVER push
 settings.json
 settings.local.json
+settings.json.bak.*
 .env*
+.erp-api-key
+.erp-retry-queue.json
+.approval-policy-events.json
+.main-push-events.json
+.mcp.json
+mcp-needs-auth-cache.json
+.qualia-traces/
+.erp-staged/
+.qualia-last-session-log
 *credentials*
 *secret*
 *.pem

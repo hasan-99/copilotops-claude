@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+/* Define your OKLCH palette here. Neutrals tinted toward the brand hue.
+   NEVER raw #000 / #fff. See .planning/DESIGN.md for the committed tokens. */
+:root {
+  --brand: oklch(0.62 0.18 264);
+  --ink: oklch(0.21 0.01 264);
+  --paper: oklch(0.99 0.004 264);
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+}

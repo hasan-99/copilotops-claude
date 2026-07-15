@@ -4,15 +4,7 @@
       "source": "github",
       "repo": "anthropics/claude-plugins-official"
     },
-    "installLocation": "/home/qualiasolutions/.claude/plugins/marketplaces/claude-plugins-official",
-    "lastUpdated": "2026-03-23T16:21:28.168Z"
-  },
-  "dev-browser-marketplace": {
-    "source": {
-      "source": "github",
-      "repo": "sawyerhood/dev-browser"
-    },
-    "installLocation": "/home/qualiasolutions/.claude/plugins/marketplaces/dev-browser-marketplace",
-    "lastUpdated": "2026-03-23T16:21:30.876Z"
+    "installLocation": "C:\\Users\\hasan\\.claude\\plugins\\marketplaces\\claude-plugins-official",
+    "lastUpdated": "2026-05-30T10:47:09.266Z"
   }
 }

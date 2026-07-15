@@ -1,0 +1,9 @@
+{
+  "id": "ai-agent",
+  "title": "AI Agent",
+  "description": "LLM / chat / agent product — Supabase data + OpenRouter routing, optional Retell/ElevenLabs/Telnyx voice. Ships only when the eval suite is green.",
+  "archetype": "ai-agent",
+  "defaultStack": "Next.js 16 (Vercel) · Supabase (Postgres + pgvector) · OpenRouter · Tailwind · Railway (workers, optional)",
+  "scaffoldEntry": "app/api/chat/route.ts",
+  "whenToUse": "Chat, RAG, tool-using agents, or voice agents. Pick this when an LLM is the core of the product — it adds OpenRouter routing, eval gates, and cost guardrails on top of a full app."
+}

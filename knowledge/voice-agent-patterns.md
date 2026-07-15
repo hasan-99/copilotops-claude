@@ -42,4 +42,5 @@ switch (event.message.type) {
 
 ## Active Voice Projects
 - armenius: ElevenLabs + Cloudflare Workers (Greek/English/Russian)
-- under: Retell AI + Vercel (Sales training)
+- under: Retell AI + Vercel (Sales training, ai.underdogsales.com)
+- Underdog Academy: Vercel (created 2026-03-14)

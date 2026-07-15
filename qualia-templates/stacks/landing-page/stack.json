@@ -1,0 +1,9 @@
+{
+  "id": "landing-page",
+  "title": "Landing Page",
+  "description": "A static/SSG marketing site — hero, features, CTA, contact. No database, no auth. Built to convert, fast to ship.",
+  "archetype": "website",
+  "defaultStack": "Next.js 16 (App Router, SSG) · Tailwind · Vercel",
+  "scaffoldEntry": "app/page.tsx",
+  "whenToUse": "Marketing site, product landing, portfolio, throwaway prototype. Pick this when there is no logged-in user and no persistent data — the page IS the product."
+}

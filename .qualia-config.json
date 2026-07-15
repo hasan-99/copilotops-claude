@@ -1,0 +1,13 @@
+{
+  "code": "QS-HASAN-02",
+  "installed_by": "Hasan",
+  "role": "EMPLOYEE",
+  "version": "7.0.1",
+  "installed_at": "2026-06-24",
+  "erp": {
+    "enabled": true,
+    "url": "https://portal.qualiasolutions.net",
+    "api_key_file": ".erp-api-key",
+    "capturePrompts": true
+  }
+}

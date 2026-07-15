@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Qualia Agents and Skills Guide</title>
+  <style>
+    :root {
+      --paper: #f7f4ed;
+      --ink: #23201a;
+      --muted: #6b6256;
+      --line: #d7cfc1;
+      --panel: #fffaf0;
+      --agent: #0f6b63;
+      --skill: #8b3f2f;
+      --accent: #d6a338;
+      --shadow: 0 16px 40px rgba(52, 42, 28, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Aptos", "Segoe UI", Tahoma, sans-serif;
+      line-height: 1.5;
+    }
+
+    header {
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(135deg, #fff6df 0%, #efe7d6 48%, #e9f1eb 100%);
+    }
+
+    .wrap {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 32px;
+      align-items: end;
+      padding: 48px 0 32px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2rem, 5vw, 4.3rem);
+      line-height: 0.95;
+      letter-spacing: 0;
+      max-width: 760px;
+    }
+
+    .lead {
+      margin: 0;
+      max-width: 720px;
+      color: var(--muted);
+      font-size: 1.06rem;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(120px, 1fr));
+      gap: 10px;
+      min-width: 270px;
+    }
+
+    .stat {
+      border: 1px solid var(--line);
+      background: rgba(255, 250, 240, 0.72);
+      padding: 16px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 2rem;
+      line-height: 1;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: center;
+      padding: 24px 0;
+    }
+
+    input[type="search"] {
+      width: 100%;
+      min-height: 46px;
+      border: 1px solid var(--line);
+      background: #fffdf7;
+      color: var(--ink);
+      padding: 0 14px;
+      font: inherit;
+      outline: none;
+    }
+
+    input[type="search"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(214, 163, 56, 0.22);
+    }
+
+    .tabs {
+      display: inline-flex;
+      border: 1px solid var(--line);
+      background: #fffdf7;
+    }
+
+    .tabs button {
+      flex: 0 0 auto;
+      border: 0;
+      border-right: 1px solid var(--line);
+      background: transparent;
+      color: var(--muted);
+      min-height: 44px;
+      padding: 0 16px;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .tabs button:last-child {
+      border-right: 0;
+    }
+
+    .tabs button.active {
+      background: var(--ink);
+      color: #fffaf0;
+    }
+
+    main {
+      padding: 0 0 56px;
+    }
+
+    section {
+      margin-top: 18px;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: baseline;
+      border-bottom: 1px solid var(--line);
+      padding: 22px 0 12px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(1.4rem, 2.2vw, 2.2rem);
+      letter-spacing: 0;
+    }
+
+    .section-head p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    article {
+      min-height: 210px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      padding: 18px;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      gap: 10px;
+    }
+
+    article[data-kind="agent"] {
+      border-top: 4px solid var(--agent);
+    }
+
+    article[data-kind="skill"] {
+      border-top: 4px solid var(--skill);
+    }
+
+    .eyebrow {
+      color: var(--muted);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    h3 {
+      margin: 0;
+      font-size: 1.15rem;
+      overflow-wrap: anywhere;
+    }
+
+    .purpose {
+      margin: 0;
+      color: #3e3931;
+    }
+
+    .path {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.86rem;
+      overflow-wrap: anywhere;
+    }
+
+    .path code {
+      color: #3b342b;
+      background: #f1e8d7;
+      padding: 2px 5px;
+    }
+
+    .empty {
+      display: none;
+      margin: 32px 0 0;
+      border: 1px dashed var(--line);
+      padding: 24px;
+      color: var(--muted);
+      background: #fffdf7;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 780px) {
+      .hero,
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+
+      .stats {
+        min-width: 0;
+      }
+
+      .tabs {
+        width: 100%;
+      }
+
+      .tabs button {
+        flex: 1 1 0;
+      }
+
+      .section-head {
+        display: block;
+      }
+
+      .section-head p {
+        margin-top: 4px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap hero">
+      <div>
+        <h1>Agents and Skills Guide</h1>
+        <p class="lead">A simple map of the agents and skills currently present in this <code>.claude</code> directory, with plain-language purpose notes and source paths.</p>
+      </div>
+      <div class="stats" aria-label="Inventory counts">
+        <div class="stat"><strong id="agentCount">9</strong><span>agents</span></div>
+        <div class="stat"><strong id="skillCount">29</strong><span>skills</span></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap toolbar">
+    <input id="search" type="search" placeholder="Search by name, purpose, or file path" aria-label="Search agents and skills">
+    <div class="tabs" aria-label="Filter list">
+      <button type="button" class="active" data-filter="all">All</button>
+      <button type="button" data-filter="agent">Agents</button>
+      <button type="button" data-filter="skill">Skills</button>
+    </div>
+  </div>
+
+  <main class="wrap">
+    <section id="agents">
+      <div class="section-head">
+        <h2>Agents</h2>
+        <p>Specialist workers spawned by Qualia workflows.</p>
+      </div>
+      <div class="grid">
+        <article data-kind="agent" data-search="qualia-builder executes a single task from a phase plan fresh context agents builder.md">
+          <div class="eyebrow">Agent</div>
+          <h3>qualia-builder</h3>
+          <p class="purpose">Builds one planned task in fresh context, changes only the assigned scope, validates it, then reports DONE, PARTIAL, or BLOCKED.</p>
+          <p class="path"><code>agents\builder.md</code></p>
+        </article>
+
+        <article data-kind="agent" data-search="qualia-plan-checker validates phase plan specificity wave assignment verification contracts agents plan-checker.md">
+          <div class="eyebrow">Agent</div>
+          <h3>qualia-plan-checker</h3>
+          <p class="purpose">Reviews a phase plan before build work starts. It catches vague tasks, weak acceptance criteria, bad wave ordering, and missing verification detail.</p>
+          <p class="path"><code>agents\plan-checker.md</code></p>
+        </article>
+
+        <article data-kind="agent" data-search="qualia-planner creates executable phase plans task breakdown wave assignments verification agents planner.md">
+          <div class="eyebrow">Agent</div>
+          <h3>qualia-planner</h3>
+          <p class="purpose">Turns project and phase context into an executable plan with task breakdowns, waves, acceptance criteria, and validation commands.</p>
+          <p class="path"><code>agents\planner.md</code></p>
+        </article>
+
+        <article data-kind="agent" data-search="qualia-qa-browser browser qa mobile tablet desktop console accessibility agents qa-browser.md">
+          <div class="eyebrow">Agent</div>
+          <h3>qualia-qa-browser</h3>
+          <p class="purpose">Uses a real browser to test frontend work across viewports, click key flows, and report console, layout, and accessibility problems.</p>
+          <p class="path"><code>agents\qa-browser.md</code></p>
+        </article>
+
+        <article data-kind="agent" data-search="qualia-research-synthesizer merges research outputs summary roadmap implications agents research-synthesizer.md">
+          <div class="eyebrow">Agent</div>
+          <h3>qualia-research-synthesizer</h3>
+          <p class="purpose">Combines the parallel research files into one SUMMARY.md without adding new claims, so roadmap work has a clean source of truth.</p>
+          <p class="path"><code>agents\research-synthesizer.md</code></p>
+        </article>
+
+        <article data-kind="agent" data-search="qualia-researcher deep research stack features architecture pitfalls context7 web search agents researcher.md">
+          <div class="eyebrow">Agent</div>
+          <h3>qualia-researcher</h3>
+          <p class="purpose">Researches one project dimension such as stack, features, architecture, or pitfalls, with citations and confidence notes.</p>
+          <p class="path"><code>agents\researcher.md</code></p>
+        </article>
+
+        <article data-kind="agent" data-search="qualia-roadmapper journey requirements roadmap milestones agents roadmapper.md">
+          <div class="eyebrow">Agent</div>
+          <h3>qualia-roadmapper</h3>
+          <p class="purpose">Creates the project journey, requirements, and current milestone roadmap from approved project context and research.</p>
+          <p class="path"><code>agents\roadmapper.md</code></p>
+        </article>
+
+        <article data-kind="agent" data-search="qualia-verifier goal backward verification phase acceptance agents verifier.md">
+          <div class="eyebrow">Agent</div>
+          <h3>qualia-verifier</h3>
+          <p class="purpose">Checks whether the phase goal actually works. It verifies code and behavior instead of trusting build summaries.</p>
+          <p class="path"><code>agents\verifier.md</code></p>
+        </article>
+
+        <article data-kind="agent" data-search="qualia-visual-evaluator screenshots design rubric polish loop agents visual-evaluator.md">
+          <div class="eyebrow">Agent</div>
+          <h3>qualia-visual-evaluator</h3>
+          <p class="purpose">Scores screenshots against the Qualia design rubric and returns the most important visible issues for polish loops.</p>
+          <p class="path"><code>agents\visual-evaluator.md</code></p>
+        </article>
+      </div>
+    </section>
+
+    <section id="skills">
+      <div class="section-head">
+        <h2>Skills</h2>
+        <p>Commands and workflows available under <code>skills\*</code>.</p>
+      </div>
+      <div class="grid">
+        <article data-kind="skill" data-search="deep-research production readiness audit frontend backend database security performance deployment skills deep-research">
+          <div class="eyebrow">Skill</div>
+          <h3>deep-research</h3>
+          <p class="purpose">Runs a broad production-readiness and best-practices analysis using parallel specialist research agents.</p>
+          <p class="path"><code>skills\deep-research\SKILL.md</code></p>
+        </article>
+
+        <article data-kind="skill" data-search="qualia router state next command what next skills qualia">
+          <div class="eyebrow">Skill</div>
+          <h3>qualia</h3>
+          <p class="purpose">Reads project state and tells you the exact next Qualia command to run.</p>
+          <p class="path"><code>skills\qualia\SKILL.md</code></p>
+        </article>
+
+        <article data-kind="skill" data-search="qualia-build execute planned phase builder subagents wave parallel atomic commits skills qualia-build">
+          <div class="eyebrow">Skill</div>
+          <h3>qualia-build</h3>
+          <p class="purpose">Executes a planned phase by sending each task to fresh builder agents, grouped by safe parallel waves.</p>
+          <p class="path"><code>skills\qualia-build\SKILL.md</code></p>
+        </article>
+
+        <article data-kind="skill" data-search="qualia-doctor framework health check install project state hooks memory erp queue skills qualia-doctor">
+          <div class="eyebrow">Skill</div>
+          <h3>qualia-doctor</h3>
+          <p class="purpose">Checks whether the Qualia framework itself is healthy before blaming a project or model run.</p>
+          <p class="path"><code>skills\qualia-doctor\SKILL.md</code></p>
+        </article>
+
+        <article data-kind="skill" data-search="qualia-eval evaluate ai feature chat rag voice agent deterministic assertions llm judges skills qualia-eval">
+          <div class="eyebrow">Skill</div>
+          <h3>qualia-eval</h3>
+          <p class="purpose">Evaluates AI features such as chat, RAG, voice, or agents with deterministic checks and model-judge rubrics.</p>
+          <p class="path"><code>skills\qualia-eval\SKILL.md</code></p>
+        </article>
+
+        <article data-kind="skill" data-search="qualia-feature single feature add component implement small change tweak skills qualia-feature">
+          <div class="eyebrow">Skill</div>
+          <h3>qualia-feature</h3>
+          <p class="purpose">Adds one focused capability outside the phase road, choosing inline work or a fresh builder based on size.</p>
+          <p class="path"><code>skills\qualia-feature\SKILL.md</code></p>
+        </article>
+
+        <article data-kind="skill" data-search="qualia-fix bug broken error failing test regression hotfix root cause repair skills qualia-fix">
+          <div class="eyebrow">Skill</div>
+          <h3>qualia-fix</h3>
+          <p class="purpose">Investigates broken behavior to find the root cause, then routes the repair through a focused implementation path.</p>
+          <p class="path"><code>skills\qualia-fix\SKILL.md</code></p>
+        </article>
+
+        <article data-kind="skill" data-search="qualia-handoff client delivery production url documentation assets archive erp finalization skills qualia-handoff">
+          <div class="eyebrow">Skill</div>
+          <h3>qualia-handoff</h3>
+          <p class="purpose">Finishes a client project by producing the required handoff deliverables.</p>
+          <p class="path"><code>skills\qualia-handoff\SKILL.md</code></p>
+        </article>
+
+        <article data-kind="skill" data-search="qualia-idk lost confused diagnostic what is happening planning codebase guidance skills qualia-idk">
+          <div class="eyebrow">Skill</div>
+          <h3>qualia-idk</h3>
+          <p class="purpose">Diagnoses confusing project situations and returns plain-language guidance plus a command sequence to get unstuck.</p>
+          <p class="path"><code>skills\qualia-idk\SKILL.md</code></p>
+        </article>
+
+        <article data-kind="skill" data-search="qualia-learn remember save pattern client preference knowledge base skills qualia-learn">
+          <div class="eyebrow">Skill</div>
+          <h3>qualia-learn</h3>
+          <p class="purpose">Saves reusable learnings, fixes, patterns, and client preferences into the local knowledge base.</p>
+          <p class="path"><code>skills\qualia-learn\SKILL.md</code></p>
+        </article>
+
+        <article data-kind="skill" data-search="qualia-map brownfield scan repo existing codebase architecture stack conventions skills qualia-map">
+          <div class="eyebrow">Skill</div>
+          <h3>qualia-map</h3>
+          <p class="purpose">Maps an existing codebase before Qualia planning, capturing architecture, stack, conventions, and capabilities.</p>
+          <p class="path"><code>skills\qualia-map\SKILL.md</code></p>
+        </article>
+
+        <article data-kind="skill" data-search="qualia-milestone close milestone next milestone roadmap journey archive skills qualia-milestone">
+          <div class="eyebrow">Skill</div>
+          <h3>qualia-milestone</h3>
+          <p class="purpose">Closes the current milestone, archives its artifacts, and opens the next milestone from JOURNEY.md.</p>
+          <p class="path"><code>skills\qualia-milestone\SKILL.md</code></p>
+        </article>
+
+        <article data-kind="skill" data-search="qualia-new new project kickoff interview research glossary adr journey setup skills qualia-new">
+          <div class="eyebrow">Skill</div>
+          <h3>qualia-new</h3>
+          <p class="purpose">Starts a new project with kickoff intake, research, glossary, decisions, journey, and approval gate.</p>
+          <p class="path"><code>skills\qualia-new\SKILL.md</code></p>
+        </article>
+
+        <article data-kind="skill" data-search="qualia-optimize performance audit ui backend alignment simplify improvement discovery skills qualia-optimize">
+          <div class="eyebrow">Skill</div>
+          <h3>qualia-optimize</h3>
+          <p class="purpose">Runs a deeper improvement-discovery pass for performance, architecture, UI alignment, and simplification opportunities.</p>
+          <p class="path"><code>skills\qualia-optimize\SKILL.md</code></p>
+        </article>
+
+        <article data-kind="skill" data-search="qualia-plan plan phase tasks wave grouped plan checker gaps skills qualia-plan">
+          <div class="eyebrow">Skill</div>
+          <h3>qualia-plan</h3>
+          <p class="purpose">Plans the current phase into wave-grouped tasks, then validates the plan before build work begins.</p>
+          <p class="path"><code>skills\qualia-plan\SKILL.md</code></p>
+        </article>
+
+        <article data-kind="skill" data-search="qualia-polish design pass redesign critique visual loop route component app skills qualia-polish">
+          <div class="eyebrow">Skill</div>
+          <h3>qualia-polish</h3>
+          <p class="purpose">Improves visual quality for components, routes, full apps, redesigns, and screenshot-driven polish loops.</p>
+          <p class="path"><code>skills\qualia-polish\SKILL.md</code></p>
+        </article>
+
+        <article data-kind="skill" data-search="qualia-postmortem self healing verify fail rule agent skill delta skills qualia-postmortem">
+          <div class="eyebrow">Skill</div>
+          <h3>qualia-postmortem</h3>
+          <p class="purpose">After a verification failure, identifies which framework rule, agent, or skill should be improved to prevent repeats.</p>
+          <p class="path"><code>skills\qualia-postmortem\SKILL.md</code></p>
+        </article>
+
+        <article data-kind="skill" data-search="qualia-recall owner only memory vault prior lessons knowledge skills qualia-recall">
+          <div class="eyebrow">Skill</div>
+          <h3>qualia-recall</h3>
+          <p class="purpose">Owner-only lookup for curated prior lessons from the local knowledge layer and Qualia memory vault.</p>
+          <p class="path"><code>skills\qualia-recall\SKILL.md</code></p>
+        </article>
+
+        <article data-kind="skill" data-search="qualia-report clock out session report commit push erp skills qualia-report">
+          <div class="eyebrow">Skill</div>
+          <h3>qualia-report</h3>
+          <p class="purpose">Runs the mandatory clock-out flow: session report, commit, push, and ERP upload handling.</p>
+          <p class="path"><code>skills\qualia-report\SKILL.md</code></p>
+        </article>
+
+        <article data-kind="skill" data-search="qualia-research domain library research before planning context7 webfetch skills qualia-research">
+          <div class="eyebrow">Skill</div>
+          <h3>qualia-research</h3>
+          <p class="purpose">Researches a domain or library before phase planning and writes the findings into the planning folder.</p>
+          <p class="path"><code>skills\qualia-research\SKILL.md</code></p>
+        </article>
+
+        <article data-kind="skill" data-search="qualia-review readonly production audit security code review severity skills qualia-review">
+          <div class="eyebrow">Skill</div>
+          <h3>qualia-review</h3>
+          <p class="purpose">Runs a read-only production audit and routes findings to the correct repair workflow.</p>
+          <p class="path"><code>skills\qualia-review\SKILL.md</code></p>
+        </article>
+
+        <article data-kind="skill" data-search="qualia-road workflow map project journey milestones phases tasks skills qualia-road">
+          <div class="eyebrow">Skill</div>
+          <h3>qualia-road</h3>
+          <p class="purpose">Shows the terminal workflow map from project kickoff through journey, milestones, phases, tasks, ship, and handoff.</p>
+          <p class="path"><code>skills\qualia-road\SKILL.md</code></p>
+        </article>
+
+        <article data-kind="skill" data-search="qualia-scope intake kickoff interview phase grill definition of done skills qualia-scope">
+          <div class="eyebrow">Skill</div>
+          <h3>qualia-scope</h3>
+          <p class="purpose">Runs project intake or phase scoping, forcing clear decisions before planning begins.</p>
+          <p class="path"><code>skills\qualia-scope\SKILL.md</code></p>
+        </article>
+
+        <article data-kind="skill" data-search="qualia-secure security scan agent config prompt injection secrets permissions mcp skills qualia-secure">
+          <div class="eyebrow">Skill</div>
+          <h3>qualia-secure</h3>
+          <p class="purpose">Scans agent config, settings, hooks, and MCP setup for prompt injection, leaked secrets, and risky permissions.</p>
+          <p class="path"><code>skills\qualia-secure\SKILL.md</code></p>
+        </article>
+
+        <article data-kind="skill" data-search="qualia-ship deploy production quality gates commit push verify skills qualia-ship">
+          <div class="eyebrow">Skill</div>
+          <h3>qualia-ship</h3>
+          <p class="purpose">Deploys to production with state guard, security scan, quality gates, commit, push, deploy, and verification.</p>
+          <p class="path"><code>skills\qualia-ship\SKILL.md</code></p>
+        </article>
+
+        <article data-kind="skill" data-search="qualia-test generate tests run tests tdd coverage skills qualia-test">
+          <div class="eyebrow">Skill</div>
+          <h3>qualia-test</h3>
+          <p class="purpose">Generates tests, runs tests, or drives a feature through a test-first loop.</p>
+          <p class="path"><code>skills\qualia-test\SKILL.md</code></p>
+        </article>
+
+        <article data-kind="skill" data-search="qualia-update launched project post launch change patch live site operate mode skills qualia-update">
+          <div class="eyebrow">Skill</div>
+          <h3>qualia-update</h3>
+          <p class="purpose">Ships one lean update to a launched project without restarting the full milestone journey.</p>
+          <p class="path"><code>skills\qualia-update\SKILL.md</code></p>
+        </article>
+
+        <article data-kind="skill" data-search="qualia-verify verify phase acceptance criteria goal backward panel skills qualia-verify">
+          <div class="eyebrow">Skill</div>
+          <h3>qualia-verify</h3>
+          <p class="purpose">Verifies a built phase against its goal using a panel approach and deterministic verdict aggregation.</p>
+          <p class="path"><code>skills\qualia-verify\SKILL.md</code></p>
+        </article>
+
+        <article data-kind="skill" data-search="zoho-workflow invoice mail erp billing crm contact payment reminders skills zoho-workflow">
+          <div class="eyebrow">Skill</div>
+          <h3>zoho-workflow</h3>
+          <p class="purpose">Handles Zoho Invoice and Mail work through the ERP-first routing for invoices, cover emails, contacts, and reminders.</p>
+          <p class="path"><code>skills\zoho-workflow\SKILL.md</code></p>
+        </article>
+      </div>
+    </section>
+
+    <p id="empty" class="empty">No matching agents or skills found.</p>
+  </main>
+
+  <script>
+    const search = document.querySelector("#search");
+    const buttons = [...document.querySelectorAll("[data-filter]")];
+    const cards = [...document.querySelectorAll("article[data-kind]")];
+    const sections = [...document.querySelectorAll("main section")];
+    const empty = document.querySelector("#empty");
+    let activeFilter = "all";
+
+    function applyFilters() {
+      const term = search.value.trim().toLowerCase();
+      let visible = 0;
+
+      cards.forEach((card) => {
+        const kindMatch = activeFilter === "all" || card.dataset.kind === activeFilter;
+        const textMatch = !term || card.dataset.search.includes(term) || card.textContent.toLowerCase().includes(term);
+        const show = kindMatch && textMatch;
+        card.classList.toggle("hidden", !show);
+        if (show) visible += 1;
+      });
+
+      sections.forEach((section) => {
+        const hasVisibleCards = !!section.querySelector("article:not(.hidden)");
+        section.classList.toggle("hidden", !hasVisibleCards);
+      });
+
+      empty.style.display = visible ? "none" : "block";
+    }
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        activeFilter = button.dataset.filter;
+        buttons.forEach((item) => item.classList.toggle("active", item === button));
+        applyFilters();
+      });
+    });
+
+    search.addEventListener("input", applyFilters);
+  </script>
+</body>
+</html>

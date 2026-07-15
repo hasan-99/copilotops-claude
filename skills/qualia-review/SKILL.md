@@ -1,0 +1,205 @@
+---
+name: qualia-review
+description: "Read-only production audit — real commands, severity-scored REVIEW.md, routes repair to /qualia-fix, /qualia-polish, or /qualia-optimize. Triggers: 'review', 'audit', 'code review', 'security check', 'production check'."
+allowed-tools:
+  - Bash
+  - Read
+  - Write
+  - Grep
+  - Glob
+  - Agent
+---
+
+# /qualia-review — Production Audit
+
+Runs real diagnostic commands and scores every finding. Not a checklist — an executable audit.
+
+Review is detection only. It never patches code. If the user wants the findings repaired, route by finding type:
+
+| Finding type | Next command |
+|---|---|
+| Broken existing behavior, failing test, security leak, config error | `/qualia-fix` |
+| Visual design quality or responsive polish | `/qualia-polish` |
+| Broad performance, architecture, or alignment opportunities | `/qualia-optimize` |
+| New missing capability | `/qualia-feature` or `/qualia-plan` |
+
+## Usage
+
+- `/qualia-review` — Full audit (security + quality + performance)
+- `/qualia-review --web` — Adds web-specific checks (headers, CORS, vitals)
+- `/qualia-review --ai` — Adds AI/voice agent checks (prompt safety, latency)
+
+## Process
+
+```bash
+node C:\Users\hasan\.claude/bin/qualia-ui.js banner review
+```
+
+### 0. Load Context
+
+```bash
+node C:\Users\hasan\.claude/bin/knowledge.js
+node C:\Users\hasan\.claude/bin/knowledge.js load fixes
+node C:\Users\hasan\.claude/bin/knowledge.js load patterns
+```
+
+Detect project shape:
+```bash
+ls package.json next.config.* tsconfig.json supabase/ app/ src/ 2>/dev/null
+```
+
+### 1. Security Scan
+
+**Run the independent greps as parallel Bash calls in a single response** (they don't depend on each other — serial execution wastes 15-30s on large codebases). Only the `find … | for` loops are sequential.
+
+```bash
+# PARALLEL BATCH (issue these in one response turn):
+
+# CRITICAL: service_role in client code
+grep -rn "service_role" --include="*.ts" --include="*.tsx" --include="*.js" app/ components/ src/ lib/ 2>/dev/null | grep -v node_modules | grep -v "\.server\.\|[\\/]server[\\/]\|[\\/]app[\\/]api[\\/]\|route\.\|middleware\."
+
+# CRITICAL: hardcoded secrets
+grep -rn "sk_live\|sk_test\|SUPABASE_SERVICE_ROLE\|eyJhbGciOi" --include="*.ts" --include="*.tsx" --include="*.js" app/ components/ src/ lib/ 2>/dev/null | grep -v node_modules | grep -v "\.env"
+
+# CRITICAL: dangerous patterns
+grep -rn "dangerouslySetInnerHTML\|eval(" --include="*.ts" --include="*.tsx" --include="*.js" app/ components/ src/ 2>/dev/null | grep -v node_modules
+
+# CRITICAL: .env files tracked in git
+git ls-files | grep -i "\.env" | grep -v "\.example\|\.template\|\.sample"
+
+# HIGH: client-side database mutations
+grep -rn "\.insert\|\.update\|\.delete\|\.upsert" --include="*.tsx" --include="*.jsx" app/ components/ 2>/dev/null | grep -v "use server" | grep -v "\.server\."
+
+# MEDIUM: npm vulnerabilities
+npm audit --json 2>/dev/null | node -e "try{const d=JSON.parse(require('fs').readFileSync(0,'utf8'));const v=d.metadata?.vulnerabilities||{};console.log('critical:',v.critical||0,'high:',v.high||0,'moderate:',v.moderate||0)}catch{console.log('audit unavailable')}"
+
+# END PARALLEL BATCH
+
+# SEQUENTIAL (depends on find):
+# HIGH: API routes without auth
+for f in $(find app/api -name "route.ts" -o -name "route.js" 2>/dev/null); do
+  if ! grep -q "getUser\|getSession\|auth()\|createClient" "$f" 2>/dev/null; then
+    echo "UNPROTECTED: $f"
+  fi
+done
+
+# HIGH: API routes without input validation
+for f in $(find app/api -name "route.ts" -o -name "route.js" 2>/dev/null); do
+  grep -L "z\.\|zod\|Zod\|parse\|safeParse" "$f" 2>/dev/null
+done
+```
+
+### 2. Code Quality Scan
+
+```bash
+# TypeScript errors (HIGH if >0)
+npx tsc --noEmit 2>&1 | grep -c "error TS"
+
+# 'any' type usage (MEDIUM — count)
+grep -rn ": any\| as any" --include="*.ts" --include="*.tsx" app/ components/ src/ lib/ 2>/dev/null | grep -v node_modules | wc -l
+
+# Empty catch blocks (HIGH)
+grep -rn "catch\s*{}\|catch\s*(.*)\s*{\s*}" --include="*.ts" --include="*.tsx" app/ components/ src/ lib/ 2>/dev/null | grep -v node_modules | head -10
+
+# TODO/FIXME left in code (LOW — count)
+grep -rn "TODO\|FIXME\|HACK\|XXX" --include="*.ts" --include="*.tsx" app/ components/ src/ lib/ 2>/dev/null | grep -v node_modules | wc -l
+
+# console.log in production code (LOW — count)
+grep -rn "console\.log" --include="*.ts" --include="*.tsx" app/ components/ src/ 2>/dev/null | grep -v node_modules | wc -l
+```
+
+### 3. Performance Scan
+
+```bash
+# Build output — read existing build artifacts (don't trigger a fresh build during a scan)
+if [ -d ".next" ]; then
+  du -sh .next/static/chunks/*.js 2>/dev/null | sort -rh | head -10
+  echo "---"
+  find .next -name "*.js" -size +200k 2>/dev/null | head -5
+else
+  echo "No .next/ build output — run 'npx next build' separately for bundle analysis (review skill does NOT trigger builds — it's a scan)"
+fi
+
+# Heavy files (>300 lines often means split needed)
+find app/ components/ src/ -name "*.tsx" -o -name "*.ts" 2>/dev/null | xargs wc -l 2>/dev/null | sort -rn | head -10
+
+# Missing next/image (MEDIUM)
+grep -rn "<img " --include="*.tsx" --include="*.jsx" app/ components/ src/ 2>/dev/null | grep -v "next/image" | wc -l
+
+# Client component ratio
+echo "use client: $(grep -rl "'use client'" --include="*.tsx" app/ components/ src/ 2>/dev/null | wc -l)"
+echo "total tsx: $(find app/ components/ src/ -name '*.tsx' 2>/dev/null | wc -l)"
+
+# Sequential data fetching (HIGH)
+grep -rn "const.*=.*await" --include="*.tsx" --include="*.ts" app/ src/ 2>/dev/null | grep -v "Promise.all\|Promise.allSettled" | head -10
+```
+
+### 4. Score and Report
+
+Create the report directory and write to `.planning/reports/review/REVIEW.md`:
+
+```bash
+mkdir -p .planning/reports/review
+```
+
+```markdown
+# Production Review — {YYYY-MM-DD}
+
+## Summary
+| Category | Critical | High | Medium | Low | Score |
+|----------|----------|------|--------|-----|-------|
+| Security | {n} | {n} | {n} | {n} | {1-5} |
+| Quality  | {n} | {n} | {n} | {n} | {1-5} |
+| Perf     | {n} | {n} | {n} | {n} | {1-5} |
+| **Total** | {n} | {n} | {n} | {n} | **{avg}/5** |
+
+## Findings
+
+### CRITICAL
+- **{title}** — `{file}:{line}` — {what's wrong} — Fix: {how}
+
+### HIGH
+- ...
+
+### MEDIUM
+- ...
+
+### LOW
+- ...
+
+## Verdict
+{PASS: no critical/high | FAIL: N blockers — fix before /qualia-ship}
+
+## Recommended Next Command
+{`/qualia-fix`, `/qualia-polish`, `/qualia-optimize`, `/qualia-feature`, or `none`} — {one-line reason}
+```
+
+**Scoring (deterministic — see `rules/grounding.md` for full rubric):**
+```
+weighted_sum   = (critical × 8) + (high × 4) + (medium × 2) + (low × 1)
+category_score = max(1, 5 − floor(weighted_sum / 8))
+```
+Same inputs always produce the same score. No subjective thresholds.
+
+Quick reference (computed from the formula — verified):
+- 0 findings, or only LOW/MEDIUM, or 1 HIGH → 5
+- 2–3 HIGH, or 1 CRITICAL → 4
+- 2 CRITICAL, or 1 CRITICAL + 2–3 HIGH → 3
+- 3 CRITICAL, or 2 CRITICAL + 2+ HIGH → 2
+- 4+ CRITICAL → 1
+
+```bash
+node C:\Users\hasan\.claude/bin/qualia-ui.js divider
+node C:\Users\hasan\.claude/bin/qualia-ui.js info "Security: {score}/5 ({n} findings)"
+node C:\Users\hasan\.claude/bin/qualia-ui.js info "Quality:  {score}/5 ({n} findings)"
+node C:\Users\hasan\.claude/bin/qualia-ui.js info "Perf:     {score}/5 ({n} findings)"
+node C:\Users\hasan\.claude/bin/qualia-ui.js end "REVIEW: {PASS|FAIL}" "{recommended next command}"
+```
+
+## Rules
+
+1. **Run every command.** Don't skip scans because "the code looks clean."
+2. **Every finding gets a severity.** No prose — CRITICAL/HIGH/MEDIUM/LOW.
+3. **Every finding gets a fix suggestion.** Not just "this is bad" — say what to do.
+4. **Review detects. It does NOT fix.** This is an audit, not a refactor. Route repair to `/qualia-fix`, design repair to `/qualia-polish`, and broad improvement to `/qualia-optimize`.
+5. **CRITICAL or HIGH = deploy blocker.** `/qualia-ship` checks for these.

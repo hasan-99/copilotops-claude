@@ -1,0 +1,117 @@
+<!doctype html>
+<!--
+  Deliberately broken page used by /qualia-polish-loop self-test Scenario 2.
+  Hits multiple absolute-ban patterns from qualia-design/design-laws.md and
+  qualia-design/design-brand.md so the vision evaluator has to identify them all.
+  Banned font (Inter), pure white + pure black, blue-purple gradient,
+  gradient text, identical 3-column card grid, "Get Started" / "Learn More"
+  generic CTAs, side-stripe border-left:4px decorative, max-width:1280
+  fixed container, outline:none without focus replacement. This fixture
+  is intentional shipped slop. Do not lift patterns from it.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BrandX</title>
+<style>
+  body {
+    margin: 0;
+    background: #ffffff;
+    color: #000000;
+    font-family: Inter, sans-serif;
+    font-weight: 400;
+  }
+  .container { max-width: 1280px; margin: 0 auto; padding: 24px; }
+  header { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; }
+  .logo { font-size: 18px; font-weight: 700; }
+  nav a { color: #000; margin-left: 24px; text-decoration: none; outline: none; }
+  nav a:hover { text-decoration: underline; }
+
+  .hero {
+    text-align: center;
+    padding: 80px 16px;
+    background: linear-gradient(135deg, #2563eb 0%, #9333ea 100%);
+    color: #ffffff;
+  }
+  .hero h1 {
+    font-size: 56px;
+    font-family: Inter, sans-serif;
+    font-weight: 800;
+    margin: 0 0 16px;
+    background: linear-gradient(90deg, #fff, #c4b5fd);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero p { font-size: 18px; max-width: 620px; margin: 0 auto 32px; }
+
+  .cta-row { display: flex; gap: 12px; justify-content: center; }
+  .btn {
+    background: #ffffff;
+    color: #000;
+    padding: 12px 24px;
+    border: 0;
+    font-family: Inter, sans-serif;
+    font-size: 16px;
+    cursor: pointer;
+    outline: none;
+  }
+  .btn-secondary { background: transparent; color: #fff; border: 1px solid #fff; }
+
+  .features { padding: 80px 0; }
+  .features h2 { font-size: 32px; text-align: center; margin: 0 0 48px; font-family: Inter, sans-serif; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .card {
+    background: #f8f9fa;
+    padding: 32px;
+    border-left: 4px solid #2563eb;
+  }
+  .card h3 { font-size: 18px; margin: 0 0 8px; font-family: Inter, sans-serif; }
+  .card p { color: #666; font-size: 14px; margin: 0; }
+
+  footer { background: #000; color: #fff; padding: 32px 0; text-align: center; font-size: 14px; }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <span class="logo">BrandX</span>
+      <nav>
+        <a href="#">Features</a>
+        <a href="#">Pricing</a>
+        <a href="#">About</a>
+      </nav>
+    </header>
+  </div>
+
+  <section class="hero">
+    <h1>Welcome to BrandX</h1>
+    <p>The AI-powered platform that helps you do more with less, built for modern teams who care about results.</p>
+    <div class="cta-row">
+      <button class="btn">Get Started</button>
+      <button class="btn btn-secondary">Learn More</button>
+    </div>
+  </section>
+
+  <div class="container features">
+    <h2>Everything you need to succeed</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Fast</h3>
+        <p>Lightning-fast performance that scales with your business needs and grows alongside you.</p>
+      </div>
+      <div class="card">
+        <h3>Secure</h3>
+        <p>Bank-grade security with end-to-end encryption keeping your data safe from prying eyes.</p>
+      </div>
+      <div class="card">
+        <h3>Easy</h3>
+        <p>Intuitive interface designed for everyone, from beginners to power users.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>2026 BrandX. All rights reserved.</footer>
+</body>
+</html>

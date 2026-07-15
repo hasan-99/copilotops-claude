@@ -5,7 +5,7 @@
 - **qualiafinal** — Modern, professional, dark theme
 - **aquador** — Clean, water-themed design
 - **glluztech** — Tech/corporate. Only project on Pages Router.
-- **inrvo** — Has MCP configured
+- **inrvo** — Has MCP configured. Custom domain: innrvo.com
 - **luxcars** — Luxury, premium aesthetics
 - **vero** — Tier 1. Has MCP configured.
 - **aibossbrainz** — Tier 1. Has MCP configured.
@@ -19,4 +19,4 @@
 
 ## Voice
 - **armenius** — Greek/English/Russian. 7 webhook tools (order status, stock, product search). PrestaShop. NOT on Vercel — Cloudflare Workers.
-- **under** — Tier 1. Sales training. underdogsales.vercel.app. Has MCP.
+- **under** — Tier 1. Sales training. ai.underdogsales.com. Has MCP.

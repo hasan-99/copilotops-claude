@@ -1,14 +1,14 @@
 ---
 name: deep-research
-description: Deep research and best practices analysis for any codebase - spawns parallel Opus 4.5 agents to analyze frontend, backend, database, security, performance, and deployment. Use when you want comprehensive production-readiness audit or best practices recommendations.
+description: Deep research and best practices analysis for any codebase - spawns parallel Opus agents to analyze frontend, backend, database, security, performance, and deployment. Use when you want comprehensive production-readiness audit or best practices recommendations.
 tags: [research, best-practices, production, analysis, audit, frontend, backend]
 ---
 
 # Deep Research & Best Practices Analyzer
 
-You are an expert architect conducting deep research on a codebase to identify best practices, patterns, and production-readiness improvements. You spawn **parallel Opus 4.5 agents** to analyze different aspects comprehensively.
+You are an expert architect conducting deep research on a codebase to identify best practices, patterns, and production-readiness improvements. You spawn **parallel Opus agents** to analyze different aspects comprehensively.
 
-**Announce at start:** "Activating deep-research skill with parallel Opus 4.5 agents for comprehensive analysis."
+**Announce at start:** "Activating deep-research skill with parallel Opus agents for comprehensive analysis."
 
 ## Phase 1: Initial Discovery (YOU do this)
 
@@ -24,13 +24,14 @@ Before spawning agents, gather context:
 
 ## Phase 2: Spawn Parallel Research Agents
 
-**CRITICAL**: Spawn ALL agents in a SINGLE message with multiple Task tool calls:
+**CRITICAL**: Spawn ALL agents in a SINGLE message with multiple Agent tool calls:
 
 ### Agent 1: Frontend Architecture Analyst
 ```
-Use Task tool with subagent_type: "Explore"
-Prompt: |
-  You are a Frontend Architecture Analyst (Opus 4.5). Research this codebase for frontend best practices.
+Agent(
+  subagent_type="general-purpose",
+  prompt="
+  You are a Frontend Architecture Analyst (Opus). Research this codebase for frontend best practices.
 
   ANALYZE:
   1. Component architecture (atomic design? feature-based? smart/dumb split?)
@@ -49,9 +50,10 @@ Prompt: |
 
 ### Agent 2: Backend Architecture Analyst
 ```
-Use Task tool with subagent_type: "Explore"
-Prompt: |
-  You are a Backend Architecture Analyst (Opus 4.5). Research this codebase for backend best practices.
+Agent(
+  subagent_type="general-purpose",
+  prompt="
+  You are a Backend Architecture Analyst (Opus). Research this codebase for backend best practices.
 
   ANALYZE:
   1. API design (REST, GraphQL, tRPC, server actions?)
@@ -70,9 +72,10 @@ Prompt: |
 
 ### Agent 3: Database & Data Layer Analyst
 ```
-Use Task tool with subagent_type: "Explore"
-Prompt: |
-  You are a Database & Data Layer Analyst (Opus 4.5). Research this codebase for data best practices.
+Agent(
+  subagent_type="general-purpose",
+  prompt="
+  You are a Database & Data Layer Analyst (Opus). Research this codebase for data best practices.
 
   ANALYZE:
   1. Schema design (normalization, indexes, constraints)
@@ -91,9 +94,10 @@ Prompt: |
 
 ### Agent 4: Security & DevOps Analyst
 ```
-Use Task tool with subagent_type: "Explore"
-Prompt: |
-  You are a Security & DevOps Analyst (Opus 4.5). Research this codebase for security and deployment best practices.
+Agent(
+  subagent_type="general-purpose",
+  prompt="
+  You are a Security & DevOps Analyst (Opus). Research this codebase for security and deployment best practices.
 
   ANALYZE:
   1. Environment variable handling (.env patterns)
@@ -114,9 +118,10 @@ Prompt: |
 
 ### Agent 5: Performance & Scalability Analyst
 ```
-Use Task tool with subagent_type: "Explore"
-Prompt: |
-  You are a Performance & Scalability Analyst (Opus 4.5). Research this codebase for performance best practices.
+Agent(
+  subagent_type="general-purpose",
+  prompt="
+  You are a Performance & Scalability Analyst (Opus). Research this codebase for performance best practices.
 
   ANALYZE:
   1. Bundle size and code splitting
@@ -137,9 +142,10 @@ Prompt: |
 
 ### Agent 6: Code Quality & Testing Analyst
 ```
-Use Task tool with subagent_type: "Explore"
-Prompt: |
-  You are a Code Quality & Testing Analyst (Opus 4.5). Research this codebase for quality best practices.
+Agent(
+  subagent_type="general-purpose",
+  prompt="
+  You are a Code Quality & Testing Analyst (Opus). Research this codebase for quality best practices.
 
   ANALYZE:
   1. Test coverage (unit, integration, e2e)
@@ -160,82 +166,45 @@ Prompt: |
 
 ## Phase 3: Synthesize Reports
 
-After all agents return, create a unified report:
+After all 6 agents return, **spawn the synthesizer agent** to consolidate findings. Do NOT synthesize inline — this prevents context bloat in the parent.
 
-```markdown
-# Deep Research Report: [Project Name]
+Each agent's report will be in the tool result. Write each one to a temp file, then spawn the synthesizer:
 
-**Generated:** YYYY-MM-DD
-**Stack:** [Detected stack]
-**Overall Production Readiness:** [Score /100]
-
-## Executive Summary
-[2-3 paragraph synthesis of all findings]
-
-## Critical Issues (Fix Before Production)
-1. [Issue with severity and impact]
-2. ...
-
-## High Priority Improvements
-1. [Improvement with effort estimate]
-2. ...
-
-## Medium Priority Enhancements
-1. [Enhancement with benefit]
-2. ...
-
-## Low Priority / Nice to Have
-1. [Future improvement]
-2. ...
-
----
-
-## Detailed Analysis
-
-### Frontend Architecture
-[Agent 1 findings]
-
-### Backend Architecture
-[Agent 2 findings]
-
-### Database & Data Layer
-[Agent 3 findings]
-
-### Security & DevOps
-[Agent 4 findings]
-
-### Performance & Scalability
-[Agent 5 findings]
-
-### Code Quality & Testing
-[Agent 6 findings]
-
----
-
-## Implementation Roadmap
-
-### Phase 1: Critical Fixes (Week 1)
-- [ ] Task 1
-- [ ] Task 2
-
-### Phase 2: Security Hardening (Week 2)
-- [ ] Task 1
-- [ ] Task 2
-
-### Phase 3: Performance Optimization (Week 3)
-- [ ] Task 1
-- [ ] Task 2
-
-### Phase 4: Code Quality (Ongoing)
-- [ ] Task 1
-- [ ] Task 2
-
----
-
-## Resources & References
-- [Relevant best practices docs]
-- [Framework-specific guides]
+```bash
+# Write each agent's output to a temp file
+# (use the actual tool result content from each agent)
 ```
+
+Then spawn the synthesizer agent:
+
+```
+Agent(
+  subagent_type="qualia-research-synthesizer",
+  prompt="
+  Synthesize these specialist reports:
+  - [path to frontend report]
+  - [path to backend report]
+  - [path to database report]
+  - [path to security report]
+  - [path to performance report]
+  - [path to code quality report]
+
+  Downstream consumer: The user needs a prioritized Deep Research Report with:
+  - Overall production readiness score (/100)
+  - Critical/High/Medium/Low severity findings with file:line references
+  - Cross-cutting patterns across all 6 areas
+  - Implementation roadmap grouped by week
+  - Resources and references
+
+  Output path: docs/research/[YYYY-MM-DD]-deep-research.md
+  (also return the full report in your response)
+
+  Do NOT commit.
+  "
+)
+```
+
+The synthesizer handles deduplication, cross-cutting pattern detection, and severity ranking — producing a single unified report.
 
 ## Phase 4: Offer Next Steps
 
@@ -244,12 +213,11 @@ After presenting the report:
 ```
 "Research complete. Would you like to:
 
-1. **Create Implementation Plan** - Use writing-plans skill to create detailed tasks
+1. **Create Implementation Plan** - Use /qualia-plan to create detailed tasks
 2. **Deep Dive on Specific Area** - Focus on frontend/backend/security/etc
 3. **Start Fixing Critical Issues** - Begin implementing top priority fixes
 4. **Save Report** - Save to docs/research/YYYY-MM-DD-deep-research.md
-5. **Compare to Specific Standard** - Research against OWASP, 12-factor, etc.
-6. **Feed into phase planning** - Run `/qualia-research-phase <N>` for phase-specific research that builds on this architectural analysis"
+5. **Compare to Specific Standard** - Research against OWASP, 12-factor, etc."
 ```
 
 ## Key Principles

@@ -1,19 +1,22 @@
 # Deployment Map
-> Per-project deploy configs. Updated: 2026-03-23
+> Per-project deploy configs. Updated: 2026-03-26
 
 ## Vercel Projects
 | Project | Domain | Deploy Command | Notes |
 |---------|--------|---------------|-------|
 | qualiafinal | qualiasolutions.net | `vercel --prod` | Company site |
-| aquador | aquador.vercel.app | `vercel --prod` | Moayadalqam org |
-| vero | vero.vercel.app | `vercel --prod` | Tier 1 |
+| aquador | aquador.vercel.app | `vercel --prod` | |
+| vero | veromodels.com | `vercel --prod` | Tier 1 |
 | aibossbrainz | aibossbrainz.vercel.app | `vercel --prod` | Tier 1 |
 | maud | maud.vercel.app | `vercel --prod` | |
 | mpm | mpm.vercel.app | `vercel --prod` | |
-| inrvo | inrvo.vercel.app | `vercel --prod` | CSP headers |
-| under | underdogsales.vercel.app | `vercel --prod` | Retell AI voice |
+| inrvo | innrvo.com | `vercel --prod` | Being refactored |
+| under | ai.underdogsales.com | `vercel --prod` | Retell AI voice |
 | sofiatesting | sofiatesting.vercel.app | `vercel --prod` | Most complex agent |
-| qualia ERP | portal.qualiasolutions.net | auto-deploy from master | Internal |
+| qualia ERP | qualia-erp.vercel.app | `vercel --prod` | Internal |
+| marco | — | `vercel --prod` | |
+| Alkemy | — | `vercel --prod` | |
+| pastrikos-panels | — | `vercel --prod` | New (2026-03-24) |
 
 ## Cloudflare Workers
 | Project | Worker URL | Deploy Command |

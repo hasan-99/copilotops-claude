@@ -1,151 +1,105 @@
 ---
 name: qualia
-description: Smart Qualia router - reads project state and auto-routes to the right command
-tags: [qualia, workflow, auto-route]
+description: "Mechanical state-driven router — reads state.js, returns the exact next command. Cheap and instant. Triggers: '/qualia', 'what next', 'what now'. For deeper situational confusion use /qualia-idk."
+allowed-tools:
+  - Bash
+  - Read
+  - Grep
+  - Glob
 ---
 
-# Qualia Smart Router
+# /qualia — What's Next?
 
-Single entry point that reads project state and routes to the appropriate Qualia action.
+Read project state. Classify your situation. Tell you the exact next command.
 
-## How It Works
+## Process
 
-1. Detect if we're in a Qualia project (has .planning/)
-2. Read STATE.md to find current position
-3. Analyze what's needed next
-4. Route to the correct /qualia: command OR execute directly
-
-## Execution
-
-### Step 1: Detect Project State
+### 1. Get State
 
 ```bash
-# Check if .planning exists
-if [ ! -d ".planning" ]; then
-  echo "NO_PROJECT"
-  exit 0
-fi
-
-# Check for STATE.md
-if [ -f ".planning/STATE.md" ]; then
-  cat .planning/STATE.md
-fi
-
-# Check for ROADMAP.md
-if [ -f ".planning/ROADMAP.md" ]; then
-  cat .planning/ROADMAP.md
-fi
-
-# List phase directories
-ls -la .planning/phases/ 2>/dev/null || echo "NO_PHASES"
+node C:\Users\hasan\.claude/bin/state.js check 2>/dev/null
 ```
 
-### Step 2: Parse Current Position
+The JSON carries a `profile` field (`strict` or `standard`; env `$QUALIA_PROFILE` wins). `strict` = hard gates, no waivers; `standard` = gates advisory, a senior may waive with a reason logged to `.planning/decisions/`. Surface it when a gate is involved.
 
-From STATE.md, extract:
-- `current_phase`: Which phase number we're on
-- `phase_status`: planning | executing | verifying | complete
-- `blockers`: Any blockers or decisions needed
+**A5 — multi-person layout.** If the JSON has `"layout": "increments"`, this project is concurrency-aware: route by the increment fields, not the single phase cursor. Continue your own claim first (`my_claim`), else start `next_increment` (the first unclaimed, not-done increment). **Never** route the operator to anything in `claimed_increments[]` — those are held by another person on another branch. The status→command mapping in the table below still applies (it's computed into `next_command`); the increment fields just tell you *which* unit is yours. Legacy projects (no `layout` field) route exactly as before.
 
-From ROADMAP.md, extract:
-- Total phases
-- Which phases are complete
-- Next phase info
-
-### Step 3: Route Decision Tree
-
-```
-NO .planning/ directory?
-  → "No Qualia project. Run /qualia:new-project to initialize."
-
-Has .planning/ but no STATE.md?
-  → "Project initialized but no state. Run /qualia:progress to diagnose."
-
-STATE.md exists:
-
-  phase_status = "needs_discussion"?
-    → Route to: /qualia:discuss-phase {current_phase}
-
-  phase_status = "discussed" or "needs_planning"?
-    → Route to: /qualia:plan-phase {current_phase}
-
-  phase_status = "planned" or "needs_execution"?
-    → Route to: /qualia:execute-phase {current_phase}
-
-  phase_status = "executed" or "needs_verification"?
-    → Route to: /qualia:verify-work {current_phase}
-
-  phase_status = "verified" or "complete"?
-    → Check if more phases exist
-    → If yes: increment phase, route to discuss
-    → If no: "Milestone complete! Run /qualia:complete-milestone"
-
-  blockers exist?
-    → Show blockers, ask user how to proceed
+Also gather context:
+```bash
+test -f .continue-here.md && echo "HANDOFF_EXISTS" && head -20 .continue-here.md || echo "NO_HANDOFF"
+git status --short 2>/dev/null | head -10
+git log --oneline -3 2>/dev/null
+ls .planning/phase-*-plan.md 2>/dev/null || echo "NO_PLANS"
+ls .planning/phase-*-verification.md 2>/dev/null || echo "NO_VERIFICATIONS"
 ```
 
-### Step 4: Execute or Prompt
-
-**If clear next action:**
-Invoke the appropriate skill directly using:
+And surface where work was left off last time — the richest "where we left off" signal lives in `.planning/reports/`:
+```bash
+node C:\Users\hasan\.claude/bin/last-report.js 2>/dev/null
 ```
-Skill(skill="qualia:{action}", args="{phase_number}")
+Exit 0 → it prints a one-line digest of the newest session report (`Last session ({date}, {age}d ago): {summary} → next: {next}`). Exit 1 → no reports yet (nothing to surface). When a project is loaded and a digest exists, print that line **at the very TOP of your output**, before the banner — so the first thing the operator (or a teammate picking the project up) sees is exactly where the last session ended.
+
+Read conversation context — what has the user been doing, what errors occurred.
+
+### 2. Classify and Route
+
+Use the state.js JSON output plus gathered context:
+
+| Situation | Detection | Route |
+|-----------|-----------|-------|
+| `no-project` | state.js returns NO_PROJECT | → `/qualia-new` |
+| `handoff` | `.continue-here.md` exists | → Read it, summarize, route to next step |
+| `mid-work` | Uncommitted changes + phase in progress | → Continue, or write `.continue-here.md` if the user wants to pause |
+| `ready-to-plan` | status == "setup" | → `/qualia-plan {N}` |
+| `ready-to-build` | status == "planned" | → `/qualia-build {N}` |
+| `ready-to-verify` | status == "built" | → `/qualia-verify {N}` |
+| `gaps-found` | status == "verified", verification == "fail", gap_cycles < 2 | → `/qualia-plan {N} --gaps` |
+| `gap-limit` | status == "verified", verification == "fail", gap_cycles >= 2 | → Escalate to Fawzi or re-plan from scratch |
+| `phase-complete` | state.js auto-advanced (status == "setup", phase > 1) | → `/qualia-plan {N}` |
+| `all-verified` | last phase verified pass, status == "verified" | → `/qualia-polish` |
+| `polished` | status == "polished" | → `/qualia-ship` |
+| `shipped` | status == "shipped" | → `/qualia-handoff` |
+| `handed-off` | status == "handed_off" | → `/qualia-report` then done |
+| `blocked` | STATE.md lists blockers or same error 3+ times | → Diagnose the evidence; `/qualia-fix` if expected behavior is known, `/qualia-review` if broader audit is needed |
+| `bug-loop` | Same files edited 3+ times, user frustrated | → Stop patching; summarize root cause evidence and route to `/qualia-fix` or `/qualia-review` |
+| `need-tests` | User mentions "tests", "coverage", "test this" | → `/qualia-test` |
+
+**Employee escalation:** If role is EMPLOYEE and situation is `gap-limit` or `bug-loop`, suggest: "Want to flag this for Fawzi?"
+
+### 3. Display
+
+**Clear next step** (use the UI helper — it reads state.js itself):
+```bash
+node C:\Users\hasan\.claude/bin/qualia-ui.js banner router
+# If a project is loaded, show the journey position first (one-glance orientation)
+test -f .planning/JOURNEY.md && node C:\Users\hasan\.claude/bin/qualia-ui.js journey-tree .planning/JOURNEY.md
+node C:\Users\hasan\.claude/bin/qualia-ui.js next "{next_command from state.js}"
 ```
 
-**If ambiguous:**
-Present options to user:
+**Ambiguous situation (multiple options):**
+Print the banner first, then use plain markdown for the options:
+```bash
+node C:\Users\hasan\.claude/bin/qualia-ui.js banner router
 ```
-Current: Phase {N} - {status}
-
-Options:
-1. Continue with {recommended_action}
-2. Check progress (/qualia:progress)
-3. Quick task (/qualia:quick)
 ```
+## Where You Are
+{1-2 sentences}
 
-## Output Format
+## I Recommend
+**{action}** — {why}
+{command}
 
-```
-## Qualia Status
-
-**Project:** {project_name from PROJECT.md or directory name}
-**Phase:** {N} of {total} - {phase_name}
-**Status:** {status_emoji} {status_description}
-
----
-
-**Next:** /qualia:{action} {phase}
-
-{If blockers: show them}
-{If decision needed: present options}
+## Other Options
+1. **{option}** — {what}
+2. **{option}** — {what}
+3. **{option}** — {what}
 ```
 
-## Status Emojis
-
-- `planning` - Planning phase
-- `executing` - Building
-- `verifying` - Testing
-- `complete` - Done
-- `blocked` - Needs input
-
-## Quick Actions
-
-If user provides argument:
-
-- `/qualia plan` → Route to /qualia:plan-phase for current phase
-- `/qualia exec` → Route to /qualia:execute-phase for current phase
-- `/qualia verify` → Route to /qualia:verify-work for current phase
-- `/qualia next` → Move to next phase
-- `/qualia quick {description}` → Pass to /qualia:quick
-
-## No Project Fallback
-
-If no .planning/ exists:
-
+**Blocker detected** (gap-limit, bug-loop, employee escalation):
+```bash
+node C:\Users\hasan\.claude/bin/qualia-ui.js banner router
+node C:\Users\hasan\.claude/bin/qualia-ui.js fail "{blocker description}"
+node C:\Users\hasan\.claude/bin/qualia-ui.js warn "Escalate to Fawzi or re-plan from scratch"
 ```
-No Qualia project detected in current directory.
 
-Options:
-1. /qualia:new-project - Initialize new project with full workflow
-2. /qualia:quick - Run a quick task without project setup
-```
+User can respond with a number, "just do it", or natural language.

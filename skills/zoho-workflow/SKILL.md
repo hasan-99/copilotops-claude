@@ -1,12 +1,24 @@
 ---
 name: zoho-workflow
-description: Zoho Invoice and Mail operations - create invoices, send emails, manage contacts. Use when Fawzi mentions invoicing, email, or Zoho.
+description: "Zoho Invoice + Mail ops via ERP-first routing. Invoices from templates, cover emails, contacts, inbox, payment reminders. Triggers: 'invoice this client', 'send an email', 'check inbox', 'create a Zoho contact', 'payment reminder'."
 tags: [zoho, invoice, email, billing, crm]
 ---
 
 # Zoho Workflow
 
-The Zoho MCP server is connected (HTTP endpoint at `zohomcp.eu`). You have FULL access to Zoho Invoice and Zoho Mail tools.
+## Route invoicing through the ERP first
+
+The Qualia ERP at `https://portal.qualiasolutions.net` owns the canonical invoice workflow. **Use it before reaching for raw Zoho MCP tools.**
+
+For any "invoice X" request, the order of preference is:
+
+1. **ERP MCP** (preferred): `mcp__qualia-erp__create_invoice_draft` + `mcp__qualia-erp__create_invoice_cover_email_draft`. These wrap Zoho with the right templates, terms, VAT treatment, and matching cover email. Templates: `monthly_retainer` (Underdog pattern — retainer + SEO + usage credit), `simple_service` (Maison Maud / Armenius pattern — single line), `project_deposit` (50% upfront, requires proposal ref), `project_balance` (final 50%).
+2. **ERP UI** (when Fawzi is at his desk): `https://portal.qualiasolutions.net/admin?tab=finance` → "New invoice from template" button.
+3. **Raw Zoho Books MCP** (`mcp__claude_ai_Zoho_Books__*`): only for things the ERP doesn't expose yet — voiding, editing existing invoices, recording payments, expenses, contact management.
+
+The full handoff runbook lives in the qualia-erp repo: `docs/finance-runbook.md`. It covers once-per-client setup, the 4 templates, the bulk monthly batch, and common errors.
+
+**Why this matters:** the ERP knows the client → Zoho contact_id mapping, the right tax treatment (Cyprus 19% / non-EU 0%), and the canonical terms templates. Calling Zoho directly bypasses all of that and reintroduces the manual hand-stitching the ERP was built to replace.
 
 ## Zoho Invoice
 
@@ -31,7 +43,7 @@ The Zoho MCP server is connected (HTTP endpoint at `zohomcp.eu`). You have FULL 
 ## Email Formatting Rules (MANDATORY)
 
 - Always append Fawzi's signature at the bottom of every email
-- Read signature HTML from `~/.claude/knowledge/email-signature.html`
+- Read signature HTML from `C:\Users\hasan\.claude/knowledge/email-signature.html`
 - Never use dashes (---) or horizontal separators
 - Never use emojis
 - Professional, direct tone

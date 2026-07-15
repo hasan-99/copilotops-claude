@@ -1,0 +1,9 @@
+{
+  "id": "full-app",
+  "title": "Full App",
+  "description": "Authenticated product — Supabase auth + Postgres + RLS, Tailwind UI, deployed on Vercel. The default for anything with user accounts and persisted data.",
+  "archetype": "web-app",
+  "defaultStack": "Next.js 16 (App Router) · Supabase (auth + Postgres + RLS) · Tailwind · Vercel",
+  "scaffoldEntry": "app/page.tsx",
+  "whenToUse": "Any product with logged-in users, roles, and a database. Pick this when users sign up, data persists per-user, and RLS must isolate tenants."
+}

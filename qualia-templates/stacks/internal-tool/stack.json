@@ -1,0 +1,9 @@
+{
+  "id": "internal-tool",
+  "title": "Internal Tool",
+  "description": "Staff-facing portal — Supabase auth (invite/SSO, no public signup), role-gated dashboard, Tailwind, Vercel. Built for a known set of internal users.",
+  "archetype": "web-app",
+  "defaultStack": "Next.js 16 (App Router) · Supabase (portal auth + RLS) · Tailwind · Vercel",
+  "scaffoldEntry": "app/page.tsx",
+  "whenToUse": "Admin panel, ops dashboard, internal CRM — a known set of staff users, no public signup. Pick this over full-app when the audience is employees, access is invite-only, and roles gate everything."
+}
